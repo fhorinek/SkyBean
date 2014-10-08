@@ -27,7 +27,7 @@ Programming
 =====
 
 <ul>
-<li>Connect SkyBean to the computer using USB interface board or using another 3.3V USB<->UART convertor</li>
+<li>Connect SkyBean to the computer using USB interface board or using another 3.3V USB2UART convertor</li>
 <li>Run python script <tt>vario_prog/src/main.py <i>[COM port] [HEX file]</i></tt></li>
 <li>Turn on vario using the button</li>
 <li><i>OR When you bricked your vario:</i> remove the battery, short out <b>+</b> and <b>-</b> on battery holder and insert battery again</li>
