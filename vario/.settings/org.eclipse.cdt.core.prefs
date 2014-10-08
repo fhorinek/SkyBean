@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRDUDEOPTIONS/delimiter=\:
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRDUDEOPTIONS/operation=replace
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRDUDEOPTIONS/value=-px32e5 -cavrisp2 -Pusb
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRTARGETMCU/delimiter=\:
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRTARGETMCU/operation=replace
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/AVRTARGETMCU/value=atxmega32e5
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/append=true
+environment/project/de.innot.avreclipse.configuration.app.release.179733524/appendContributed=false
