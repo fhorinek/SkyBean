@@ -15,7 +15,6 @@ div.tab
     font-weight: bold;
     font-size: 14pt;
     text-align: center;
-  /*  padding-top: 75px;*/
 }
 
 div.tab_active
@@ -35,16 +34,9 @@ div.tab_active
     height: 100%;
 }
 
-div.page_hidden
+.menu_links
 {
-    display: none;
-}
-
-div.page_active
-{
-    display: block;
-    width: 100%;
-    height: 100%;
+    font-style: italic;
 }
 
 

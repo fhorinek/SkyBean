@@ -8,7 +8,22 @@ webview.fb_window
     width: 350px;
 }
 
-#no_wizard
+
+#port_manual
 {
-    font-style: italic;
+    display: none;
+}
+
+#loader
+{
+    /*display: none;*/
+    margin: auto;
+    width: 200px;
+    height: 50px;
+}
+
+#port_wizard_text
+{
+    font-size: 15pt;
+    font-weight: bold;
 }

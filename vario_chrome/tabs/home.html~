@@ -1,18 +1,53 @@
-<webview class="fb_window" id="fb_window" src="https://rbf.nanodesign.sk/public/horinek/fb.html"></webview>
+<!--webview class="fb_window" id="fb_window" src="https://rbf.nanodesign.sk/public/horinek/fb.html"></webview-->
 
 <h1>Home</h1>
 Welcome to SkyBean configurator ...
 
 <h2>Load configuration from SkyBean</h2>
+
+<div>
+    <div id="port_wizard_text"></div>
+    <div id="port_wizard_desc"></div>
+</div>
+
 <div id="port_wizard">
-    <span id="port_wizard"></span>
+
+
+    <div class="loader">
+        <div id="followingBallsG">
+            <div id="followingBallsG_1" class="followingBallsG"></div>
+            <div id="followingBallsG_2" class="followingBallsG"></div>
+            <div id="followingBallsG_3" class="followingBallsG"></div>
+            <div id="followingBallsG_4" class="followingBallsG"></div>
+        </div>
+    </div>
+
+
     <br>
-    <a id="no_wizard" href="#">I know what what is COM port</a>
+    <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
 </div> 
 <div id="port_manual">
-    
-    <select name="port" id="port">
+    <div class="loader">
+        <div id="followingBallsG">
+            <div id="followingBallsG_1" class="followingBallsG"></div>
+            <div id="followingBallsG_2" class="followingBallsG"></div>
+            <div id="followingBallsG_3" class="followingBallsG"></div>
+            <div id="followingBallsG_4" class="followingBallsG"></div>
+        </div>
+    </div>    
+
+
+    <select name="port_selector" id="port_selector">
+        <option disabled>No COM ports found</option>
     </select>
+
+    <div>
+        <input type="button" id="port_refresh" title="Refresh Ports" />
+        <input type="button" id="port_open" title="Load configuration" />        
+    </div>
+ 
+    <br>
+    <a id="yes_wizard" class="menu_links" href="#">I don't know what to do.</a>
 </div>
    
 

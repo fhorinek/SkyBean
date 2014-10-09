@@ -1,5 +1,6 @@
 
 tabs = [];
+tabs_inited = [];
 
 function add_tab(name, label, icon_name)
 {
@@ -19,33 +20,35 @@ function add_tab(name, label, icon_name)
     $(new_menu).append(inner);
     $(new_menu).addClass("tab");
     $(new_menu).click(function () {
-        show_page(name);
+        set_page(name);
     });
 
     $("#menu").append(new_menu);
     
     page = document.createElement("div");
     $(page).attr("id", "page_" + name);
-    $(page).addClass("page_hidden");
+    $(page).ready("asdfasd");
     $(page).load("tabs/" + name + ".html");
     
+    
     $("#page").append(page);
+    $(page).hide();
     
     tabs.push(name);
 }
 
-function show_page(name)
+function set_page(name)
 {
     for (id in tabs)
         if (tabs[id] == name)
         {
             $("#tab_" + tabs[id]).addClass("tab_active");
-            $("#page_" + tabs[id]).addClass("page_active");
+            $("#page_" + tabs[id]).show(function() {show_page(name)});
         }
         else
         {
             $("#tab_" + tabs[id]).removeClass("tab_active");    
-            $("#page_" + tabs[id]).removeClass("page_active");    
+            $("#page_" + tabs[id]).hide();   
         }
 }
 
@@ -61,11 +64,28 @@ function init_page(name)
 
 }
 
+function show_page(name)
+{
+    if (tabs_inited.indexOf(name) == -1)
+    {
+        init_page(name);
+        tabs_inited.push(name);
+    }
+        
+    switch (name)
+    {
+        case("home"):
+           // tab_home_init();
+        break;
+    }        
+}
+
 $(document).ready(function(){
     add_tab("home", "Home", "home");
-    add_tab("cfg", "Settings", "gear");
+    add_tab("settings", "Settings", "gear");
     add_tab("prof1", "Profile 1", "bar-chart");
     add_tab("prof2", "Profile 2", "bar-chart");
     
-    show_page("home");
+    
+    //show_page("home");
 });
