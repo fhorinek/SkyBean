@@ -1,0 +1,70 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+div.tab
+{
+    display: block;
+    float: left;
+    border-bottom: 1px solid white;
+    width: 100px;
+    height: 100px;
+    color: darkgray;
+    
+    font-weight: bold;
+    font-size: 14pt;
+    text-align: center;
+  /*  padding-top: 75px;*/
+}
+
+div.tab_active
+{
+    background-repeat: no-repeat;
+    background-position: center;    
+    background: linear-gradient(to right, #F0F0F0, white);
+    color: black;
+}
+
+.valign
+{
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+div.page_hidden
+{
+    display: none;
+}
+
+div.page_active
+{
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+#menu
+{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    left: 0;
+    
+    background: linear-gradient(to right, #F0F0F0 , lightgray); 
+}
+
+#page
+{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 100px;
+    margin-left: 10px;
+}

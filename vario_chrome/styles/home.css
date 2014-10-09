@@ -1,0 +1,19 @@
+webview.fb_window
+{
+    position: absolute; 
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 350px;
+}
+
+#no_wizard
+{
+    font-style: italic;
+}
+
+#port_manual
+{
+    display: none;
+}

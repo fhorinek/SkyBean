@@ -1,0 +1,19 @@
+<webview class="fb_window" id="fb_window" src="https://rbf.nanodesign.sk/public/horinek/fb.html"></webview>
+
+<h1>Home</h1>
+Welcome to SkyBean configurator ...
+
+<h2>Load configuration from SkyBean</h2>
+<div id="port_wizard">
+    <span id="port_wizard"></span>
+    <br>
+    <a id="no_wizard" href="#">I know what what is COM port</a>
+</div> 
+<div id="port_manual">
+    
+    <select name="port" id="port">
+    </select>
+</div>
+   
+
+
