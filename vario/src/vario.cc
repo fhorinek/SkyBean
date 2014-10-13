@@ -45,11 +45,7 @@ void init_low_power()
 	PR.PRPC = 0b00011100;
 
 	//stop port D TWI USART1 USART0 SPI HIRES TC1 TC0
-#ifdef ENABLE_DEBUG_UART
-	PR.PRPD = 0b01001101; //usart enabled
-#else
 	PR.PRPD = 0b01011101;
-#endif
 
 	//NVM EE power reduction mode
 	NVM.CTRLB |= 0b00000010;
@@ -95,6 +91,9 @@ void Setup()
 	ClockSetSource(x32MHz);
 #endif
 
+	GpioSetDirection(LEDR, OUTPUT);
+	GpioSetDirection(LEDG, OUTPUT);
+
 	LoadEEPROM();
 
 	init_low_power();
@@ -105,11 +104,7 @@ void Setup()
 	GpioRemap(&PORTD, gpio_remap_usart);
 	GpioRemap(&PORTC, gpio_remap_timerA | gpio_remap_timerB | gpio_remap_timerC | gpio_remap_timerD);
 
-
-#ifdef ENABLE_DEBUG_UART
 	pc_init();
-#endif
-
 
 	//enable i2c pull-ups
 	GpioSetDirection(I2C_EN, OUTPUT);

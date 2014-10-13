@@ -60,6 +60,9 @@ function init_page(name)
         case("home"):
             tab_home_init();
         break;
+        case("profile"):
+            tab_profile_init();
+        break;
     }    
 
 }
@@ -83,8 +86,7 @@ function show_page(name)
 $(document).ready(function(){
     add_tab("home", "Home", "home");
     add_tab("settings", "Settings", "gear");
-    add_tab("prof1", "Profile 1", "bar-chart");
-    add_tab("prof2", "Profile 2", "bar-chart");
+    add_tab("profile", "Profile", "bar-chart");
     
     
     set_page("home");

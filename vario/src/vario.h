@@ -59,7 +59,7 @@
 #define BUTTON_DOWN		(GpioRead(BUTTON_PIN) == LOW)
 
 //auto power off constants
-#define AUTO_TIMEOUT	(60000 * 5) //5min
+//#define AUTO_TIMEOUT	(60000 * 5) //5min
 #define AUTO_THOLD		1 //+-1m == max diff 2m
 
 

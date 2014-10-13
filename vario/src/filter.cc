@@ -10,9 +10,7 @@ extern float temperature;
 extern float altitude0;
 
 extern float ram_sea_level_Pa;
-extern float ram_kalman_q;
-extern float ram_kalman_r;
-extern float ram_kalman_p;
+
 extern float raw_pressure;
 extern float pressure;
 extern float climb;
@@ -21,10 +19,10 @@ extern float ram_climb_noise;
 //use the 25-th sample as a reference
 // 25 -> 0.5 s derivation
 // 50 -> 1.0 s derivation
-#define LAST_ALT_CNT	25
+#define ALT_CNT	50
 //#define LAST_ALT_CNT	50
 
-float last_alt[LAST_ALT_CNT];
+float last_alt[ALT_CNT];
 uint8_t last_alt_index = 0;
 
 extern SENSOR;
@@ -37,10 +35,10 @@ float kalman_update(float measurement)
 {
 	//prediction update
 	//omit x = x
-	kalman_state_p += ram_kalman_q;
+	kalman_state_p += cfg.kalman_q;
 
 	//measurement update
-	kalman_state_k = kalman_state_p / (kalman_state_p + ram_kalman_r);
+	kalman_state_k = kalman_state_p / (kalman_state_p + cfg.kalman_r);
 	kalman_state_x += kalman_state_k * (measurement - kalman_state_x);
 	kalman_state_p = (1 - kalman_state_k) * kalman_state_p;
 
@@ -51,7 +49,7 @@ float kalman_update(float measurement)
 void filter_init()
 {
 	//kalman init
-	kalman_state_p = ram_kalman_p;
+	kalman_state_p = cfg.kalman_p;
 }
 
 //float x1 = 0;
@@ -117,7 +115,7 @@ void filter_step()
 
 	//get the vertical speed
 	// - this is difference between current altitude and altitude from the past
-	climb = altitude0 - last_alt[(last_alt_index + LAST_ALT_CNT) % LAST_ALT_CNT];
+	climb = altitude0 - last_alt[(last_alt_index + cfg.int_interval) % cfg.int_interval];
 
 	//Normalize climb in m/s
 	// - sample rate need to be divided with derivation constant climb in  m/s
@@ -125,15 +123,15 @@ void filter_step()
 	//   value 0.5 seconds ago, it will be if meters per 0.5 second
 	//   so you need to multiply it by 2 to get meter per second
 	// - sensor reading frequency is 50Hz
-	climb *= 50 / LAST_ALT_CNT;
+	climb *= 50 / cfg.int_interval;
 
 	//remove noise
 	if (abs(climb) < abs(ram_climb_noise))
 		climb = 0.0;
 
 	//store this altitude to circular buffer
-	last_alt[(last_alt_index + LAST_ALT_CNT) % LAST_ALT_CNT] = altitude0;
+	last_alt[(last_alt_index + cfg.int_interval) % cfg.int_interval] = altitude0;
 	//move circulat buffer index
-	last_alt_index = (last_alt_index + 1) % LAST_ALT_CNT;
+	last_alt_index = (last_alt_index + 1) % cfg.int_interval;
 }
 

@@ -14,12 +14,12 @@ webview.fb_window
     display: none;
 }
 
-#loader
+.loader
 {
     /*display: none;*/
-    margin: auto;
+    margin: 25px auto;
     width: 200px;
-    height: 50px;
+    height: 25px;
 }
 
 #port_wizard_text

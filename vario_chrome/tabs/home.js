@@ -17,6 +17,7 @@ function update_port_state()
             $("#port_wizard_text").html("Looking for COM port");
             $("#port_wizard_desc").html("Connect USB interface board. If is the board allready connected disconnect the board and reconnect it again.");
             $(".loader").show();
+            $("#reset_wizard").hide();            
         break;
         case(1):
             $("#port_wizard_text").html("Manual COM selection");
@@ -27,6 +28,7 @@ function update_port_state()
             $("#port_wizard_text").html("Waiting for SkyBean");
             $("#port_wizard_desc").html("Connect the SkyBean to interface board and turn it on.");
             $(".loader").show();
+            $("#reset_wizard").show();            
         break;
         case(3):
             $("#port_wizard_text").html("Downloading configuration");
@@ -80,12 +82,16 @@ function tab_home_init()
 {
     start_wizard();
 
+    $("#reset_wizard").click(function(){
+        start_wizard();
+    });
+    
     $("#no_wizard").click(function(){
         $("#port_wizard").hide();
         $("#port_manual").show();
         
         start_manual();
-    });
+    });    
     
     $("#yes_wizard").click(function(){
         $("#port_wizard").show();

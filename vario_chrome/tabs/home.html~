@@ -42,8 +42,8 @@ Welcome to SkyBean configurator ...
     </select>
 
     <div>
-        <input type="button" id="port_refresh" title="Refresh Ports" />
-        <input type="button" id="port_open" title="Load configuration" />        
+        <input type="button" id="port_refresh" value="Refresh Ports" />
+        <input type="button" id="port_open" value="Load configuration" />        
     </div>
  
     <br>

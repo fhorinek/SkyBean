@@ -10,6 +10,7 @@
 
 #include "xlib/core/usart.h"
 #include "common.h"
+#include "build_number.h"
 
 void pc_init();
 void pc_step();

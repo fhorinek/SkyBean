@@ -1,0 +1,12 @@
+*~
+*.o
+*.lss
+*.map
+*.hex
+*.eep
+*.elf
+Release/*
+*.mk
+*.pyc
+*.d
+
