@@ -81,7 +81,7 @@ void LoadEEPROM()
 	Check(cfg.kalman_p, 0, 10, 30.0);
 	Check(cfg.int_interval, 12, 50, 25);
 
-	eeprom_read_block(&prof, &ee_prof[cfg.selected_profile], sizeof(cfg));
+	eeprom_read_block(&prof, &ee_prof[cfg.selected_profile], sizeof(prof));
 	for (uint8_t i = 0; i < 41; i++)
 	{
 		//todo: fallback table

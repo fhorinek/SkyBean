@@ -32,7 +32,7 @@ function update_port_state()
         break;
         case(3):
             $("#port_wizard_text").html("Downloading configuration");
-            $("#port_wizard_desc").html("Please wait until the configuration is downloade from the SkyBean");
+            $("#port_wizard_desc").html("Please wait until the configuration is downloaded from the SkyBean");
         break;
         case(4):
             $("#port_wizard_text").html("Done");
@@ -48,13 +48,129 @@ function update_port_state()
 }
 
 
+var port_info = null;
+var parser_length = 0;
+
+// 0 - none
+// 1 - hello
+// 2 - version
+// 3 - read data
+var parser_cmd = 0;
+var parser_hello = "skybean";
+var parser_buffer = "";
+var vario_version = false;
+
+
+var convertStringToArrayBuffer=function(str) 
+{
+    var buf=new ArrayBuffer(str.length);
+    var bufView=new Uint8Array(buf);
+    for (var i=0; i<str.length; i++) {
+    bufView[i]=str.charCodeAt(i);
+    }
+    return buf;
+}
+
+function serial_parse(c)
+{
+    switch(parser_cmd)
+    {
+        case(0):
+        return;
+        
+        case(1):
+            if (c == parser_hello.charAt(parser_length))
+            {
+                parser_length++;
+                if (parser_length == parser_hello.length)
+                {
+                    //get version
+                    parser_cmd = 2;
+                    parser_buffer = "";
+                    chrome.serial.send(port_info.connectionId, convertStringToArrayBuffer('V'), function() {
+                        console.log("data send");
+                    });
+                }
+            }
+            else
+            {
+                if (parser_length > 0)
+                    parser_length = 0;
+            }
+        break;
+        
+        case(2):
+            parser_buffer += c;
+            if (parser_buffer.length == 2)
+            {
+                ver = parser_buffer.charCodeAt(0) << 8;
+                ver += parser_buffer.charCodeAt(1);
+                
+                vario_version = ver;
+                
+                console.log("SkyBean FW build:" + ver.toString());
+                
+                //get cfg
+                parser_cmd = 3;
+                parser_buffer = "";
+                chrome.serial.send(port_info.connectionId, convertStringToArrayBuffer('R'), function() {
+                    console.log("data send");
+                });           
+                     
+                port_state = 3;
+                update_port_state();                
+            }
+        break;
+        
+        case(3):
+            parser_buffer += c;
+            if (parser_buffer.length == 834)            
+            {
+                var actual_cfg = decode_cfg(parser_buffer);
+                console.log(actual_cfg);
+                
+                var actual_prof = new Array(3);
+                actual_prof[0] = decode_prof(parser_buffer, 0);
+                actual_prof[1] = decode_prof(parser_buffer, 1);
+                actual_prof[2] = decode_prof(parser_buffer, 2);
+
+                console.log(actual_prof);
+                
+                port_state = 4;
+                update_port_state();                     
+            }
+        break;
+
+    }
+}
+
+function serial_init()
+{
+    chrome.serial.onReceive.addListener(function (info){
+        v = new Uint8Array(info.data);
+        for (i = 0; i < v.length; i++)
+            serial_parse(String.fromCharCode(v[i]));
+    });
+    
+ /*   chrome.serial.onReceiveError.addListener(function (info){
+        console.log(info);
+    });*/
+}
+
 function open_port()
 {
-    chrome.serial.connect(port_name, function(info){
+    console.log("Opening " + port_name);
+
+    chrome.serial.connect(port_name, {bitrate: 115200}, function(info){
         console.log(info);
+        
+        port_info = info;
         
         port_state = 2;
         update_port_state();
+        
+        parser_cmd = 1;
+        parser_length = 0;
     });
 }
 
@@ -80,6 +196,7 @@ function start_manual()
 
 function tab_home_init()
 {
+    serial_init();
     start_wizard();
 
     $("#reset_wizard").click(function(){
@@ -136,6 +253,7 @@ function update_ports_wizard(devices)
                 port_state = 2;
                 port_name = path;
                 update_port_state();
+                open_port();
             }
         }
         ports_old = new_ports;
@@ -149,7 +267,7 @@ function update_ports_wizard(devices)
 
 function update_ports_manual(devices)
 {
-    $("#port_selector").html("");
+    $("#port_selector").empty();
 
     for (id in devices)
     {

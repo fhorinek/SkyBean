@@ -7,16 +7,23 @@
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/font-awesome.css" rel="stylesheet">    
     <link href="styles/loader.css" rel="stylesheet">  
+    <link href="styles/bootstrap.min.css" rel="stylesheet">  
 
     <script src="js/jquery.js"></script>
+    <script src="js/jquery.flot.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/struct.js"></script>
+    <script src="js/DROPDOWN.js"></script>
     
     <script src="tabs/home.js"></script>
     <link href="tabs/home.css" rel="stylesheet">        
     
     <script src="tabs/profile.js"></script>
     <link href="tabs/profile.css" rel="stylesheet">    
-    
+
+    <script src="tabs/settings.js"></script>
+    <link href="tabs/settings.css" rel="stylesheet">    
 </head>
 <body>
 

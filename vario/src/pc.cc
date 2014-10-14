@@ -52,8 +52,8 @@ void pc_cfg()
 				//load all 3 profiles
 				for (uint8_t i = 0; i < 3; i++)
 				{
-				eeprom_busy_wait();
-				eeprom_read_block(&prof, &ee_prof[i], sizeof(cfg));
+					eeprom_busy_wait();
+					eeprom_read_block(&prof, &ee_prof[i], sizeof(prof));
 
 					for (uint16_t j = 0; j < sizeof(prof); j++)
 					{

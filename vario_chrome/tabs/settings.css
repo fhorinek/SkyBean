@@ -1,0 +1,39 @@
+
+.set_label
+{
+    font-size: 16pt;
+    
+    float: left;
+    width: 250px;
+    height: 35px;
+}
+
+.set_value
+{
+    font-size: 16pt;
+    
+    float: left;
+    width: 250px;
+    height: 35px;
+}
+
+.set_note
+{
+    color: gray;
+    font-style: italic;
+    width: 100%;
+    float: left;
+}
+
+.set_value_inactive
+{
+    color: lightgray;
+}
+
+div.line
+{
+    margin-top: 20px;
+    float: left;
+    width: 100%;
+}
+

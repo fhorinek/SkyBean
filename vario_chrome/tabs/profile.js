@@ -70,17 +70,15 @@ function profile_redraw()
 
 }
 
-function tab_profile_init()
+function profile_init_plot()
 {
-    profile_redraw();
-        
 	var on_point = false;
 	var clicked = false;
 	var series_index;
 	var point_index;
 	var data_x;
 	var data_y;
-	    
+
     $("#plot").bind("mousedown", function (event, pos, item) {
         if (on_point)
         {
@@ -126,15 +124,37 @@ function tab_profile_init()
         else
             on_point = false;
    });
+   
+   profile_redraw();
+}
 
+function profile_resize()
+{
+    $("#plot").empty();
+    profile_redraw();
+}
+
+function tab_profile_init()
+{
+    profile_init_plot()
+
+    var resizeTimer;
+
+    $(window).resize(function (){
+        if ($("#page_profile").is(":visible"))
+        {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(profile_resize, 100);    
+        }
+    });
+	    
     row = document.createElement("tr");
     for (i = 0; i < 41; i++)
     {
         td = document.createElement("td");
         button = document.createElement("input");
-        $(button).attr("type", "button");
-        $(button).attr("value", "+");      
-        $(td).append(button);  
+        $(lock).attr("type", "checkbox");
+        $(td).append(lock);  
         
         $(row).append(td);
     }
