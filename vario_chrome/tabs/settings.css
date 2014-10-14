@@ -1,23 +1,28 @@
 
-.set_label
+div.set_label
 {
     font-size: 16pt;
     
     float: left;
-    width: 250px;
+    width: 220px;
     height: 35px;
 }
 
-.set_value
+div.set_value i
 {
     font-size: 16pt;
     
-    float: left;
-    width: 250px;
-    height: 35px;
+
 }
 
-.set_note
+div.set_value
+{
+    float: left;
+    /*width: 350px;
+    /*height: 35px;*/
+}
+
+div.set_note
 {
     color: gray;
     font-style: italic;
@@ -35,5 +40,10 @@ div.line
     margin-top: 20px;
     float: left;
     width: 100%;
+}
+
+#page_settings select
+{
+    width: 100px;
 }
 

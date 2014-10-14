@@ -25,6 +25,7 @@ Welcome to SkyBean configurator ...
 
     <br>
     <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
+    <a id="reset_wizard" class="menu_links"  href="#">Reset wizard</a>
 </div> 
 <div id="port_manual">
     <div class="loader">

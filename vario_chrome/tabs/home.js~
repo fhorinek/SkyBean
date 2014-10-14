@@ -60,6 +60,9 @@ var parser_hello = "skybean";
 var parser_buffer = "";
 var vario_version = false;
 
+var actual_cfg;
+var actual_prof;
+
 
 var convertStringToArrayBuffer=function(str) 
 {
@@ -126,10 +129,10 @@ function serial_parse(c)
             parser_buffer += c;
             if (parser_buffer.length == 834)            
             {
-                var actual_cfg = decode_cfg(parser_buffer);
+                actual_cfg = decode_cfg(parser_buffer);
                 console.log(actual_cfg);
                 
-                var actual_prof = new Array();
+                actual_prof = new Array(3);
                 actual_prof[0] = decode_prof(parser_buffer, 0);
                 actual_prof[1] = decode_prof(parser_buffer, 1);
                 actual_prof[2] = decode_prof(parser_buffer, 2);

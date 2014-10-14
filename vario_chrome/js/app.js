@@ -1,6 +1,5 @@
 
 tabs = [];
-tabs_inited = [];
 
 function add_tab(name, label, icon_name)
 {
@@ -27,10 +26,8 @@ function add_tab(name, label, icon_name)
     
     page = document.createElement("div");
     $(page).attr("id", "page_" + name);
-    $(page).ready("asdfasd");
     $(page).load("tabs/" + name + ".html");
-    
-    
+
     $("#page").append(page);
     $(page).hide();
     
@@ -43,12 +40,12 @@ function set_page(name)
         if (tabs[id] == name)
         {
             $("#tab_" + tabs[id]).addClass("tab_active");
-            $("#page_" + tabs[id]).show(function() {show_page(name)});
+            $("#page_" + tabs[id]).show(0, function() {show_page(name)});
         }
         else
         {
             $("#tab_" + tabs[id]).removeClass("tab_active");    
-            $("#page_" + tabs[id]).hide();   
+            $("#page_" + tabs[id]).hide(0);   
         }
 }
 
@@ -63,31 +60,37 @@ function init_page(name)
         case("profile"):
             tab_profile_init();
         break;
+        case("settings"):
+            tab_settings_init();
+        break;    
     }    
 
 }
 
 function show_page(name)
 {
-    if (tabs_inited.indexOf(name) == -1)
-    {
-        init_page(name);
-        tabs_inited.push(name);
-    }
         
     switch (name)
     {
         case("home"):
            // tab_home_init();
         break;
+        case("settings"):
+            tab_settings_show();
+        break;
     }        
 }
 
+
 $(document).ready(function(){
+    $(document).ajaxComplete(function(event, xhr, settings){
+        name = settings.url.replace("tabs/", "").replace(".html", "");
+        init_page(name);
+    });
+
     add_tab("home", "Home", "home");
     add_tab("settings", "Settings", "gear");
     add_tab("profile", "Profile", "bar-chart");
-    
     
     set_page("home");
 });

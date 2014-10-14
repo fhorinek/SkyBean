@@ -4,17 +4,16 @@
     <meta charset="utf-8">
     <title>SkyBean configurator</title>
 
-    <link href="styles/main.css" rel="stylesheet">
     <link href="styles/font-awesome.css" rel="stylesheet">    
     <link href="styles/loader.css" rel="stylesheet">  
-    <link href="styles/bootstrap.min.css" rel="stylesheet">  
+    <link href="js/jquery-ui/jquery-ui.css" rel="stylesheet">  
+    <link href="styles/main.css" rel="stylesheet">
 
     <script src="js/jquery.js"></script>
     <script src="js/jquery.flot.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui/jquery-ui.js"></script>
     <script src="js/app.js"></script>
     <script src="js/struct.js"></script>
-    <script src="js/DROPDOWN.js"></script>
     
     <script src="tabs/home.js"></script>
     <link href="tabs/home.css" rel="stylesheet">        

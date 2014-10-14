@@ -3,6 +3,11 @@ html, body {
   margin: 0;
 }
 
+h1, h2, h3, b
+{
+    color: #428bca;
+}
+
 div.tab
 {
     display: block;
@@ -10,7 +15,7 @@ div.tab
     border-bottom: 1px solid white;
     width: 100px;
     height: 100px;
-    color: darkgray;
+    color: #428bca;
     
     font-weight: bold;
     font-size: 14pt;
@@ -23,6 +28,11 @@ div.tab_active
     background-position: center;    
     background: linear-gradient(to right, #F0F0F0, white);
     color: black;
+}
+
+div.tab_inactive
+{
+    color: lightgray;
 }
 
 .valign
@@ -58,5 +68,12 @@ div.tab_active
     bottom: 0;
     right: 0;
     left: 100px;
-    margin-left: 10px;
+    margin-left: 20px;
+}
+
+.ui-spinner-input
+{
+    padding: 4px 4px;
+    width: 65px;
+    text-align: right;
 }

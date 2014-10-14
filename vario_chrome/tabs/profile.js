@@ -152,7 +152,7 @@ function tab_profile_init()
     for (i = 0; i < 41; i++)
     {
         td = document.createElement("td");
-        button = document.createElement("input");
+        lock = document.createElement("input");
         $(lock).attr("type", "checkbox");
         $(td).append(lock);  
         
