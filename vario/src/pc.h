@@ -10,6 +10,7 @@
 
 #include "xlib/core/usart.h"
 #include "common.h"
+#include "vario.h"
 #include "build_number.h"
 
 void pc_init();

@@ -33,12 +33,12 @@
 #define FLUID_LIFT_REFRESH	20
 //1 == 20ms
 
-//#define FAST_CLOCK
-#define SLOW_CLOCK
+#define FAST_CLOCK
+//#define SLOW_CLOCK
 
 //uart debug & timing pin
 //#define ENABLE_DEBUG_TIMING
-//#define ENABLE_DEBUG_UART
+#define ENABLE_DEBUG_UART
 
 //pinout
 #define LEDR			porta1

@@ -3,7 +3,6 @@
 	<name>vario</name>
 	<comment></comment>
 	<projects>
-		<project>xlib32e5</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -24,7 +24,9 @@ struct profile
 	uint8_t sink_treshold;		//1		263
 
 	uint8_t enabled;			//1		264
-};								//795
+
+	uint8_t reserved[6];		//6		265
+};								//271 *3 = 813
 
 typedef struct profile profile;
 
@@ -46,7 +48,9 @@ struct configuration
 	float kalman_p;				//4		34
 
 	uint8_t int_interval;		//1		38		12 - 50
-};								//39
+
+	uint8_t reserved[10];		//10	39
+};								//49
 
 typedef struct configuration configuration;
 
@@ -54,5 +58,5 @@ typedef struct configuration configuration;
 }
 #endif
 
-								//834
+								//862 - spolu
 #endif /* PROFILES_H_ */

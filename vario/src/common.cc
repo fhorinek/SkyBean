@@ -78,7 +78,7 @@ void LoadEEPROM()
 	}
 	Check(cfg.kalman_q, 0, 10, 0.001);
 	Check(cfg.kalman_r, 0, 10, 6.0);
-	Check(cfg.kalman_p, 0, 10, 30.0);
+	Check(cfg.kalman_p, 0, 100, 30.0);
 	Check(cfg.int_interval, 12, 50, 25);
 
 	eeprom_read_block(&prof, &ee_prof[cfg.selected_profile], sizeof(prof));
@@ -89,8 +89,8 @@ void LoadEEPROM()
 		Check(prof.buzzer_pause[i], 0, 2000, 100);
 		Check(prof.buzzer_length[i], 0, 2000, 100);
 	}
-	Check(prof.lift_treshold, -1500, 1500, 10);
-	Check(prof.sink_treshold, -1500, 1500, -50);
+	Check(prof.lift_treshold, 0, 5, 1);
+	Check(prof.sink_treshold, 0, 5, 1);
 
 	Check(prof.enabled, 0, 1, 1);
 
@@ -104,7 +104,7 @@ void LoadEEPROM()
 void StoreVolume()
 {
 	eeprom_busy_wait();
-	eeprom_write_byte(&ee_cfg.buzzer_volume, cfg.buzzer_volume);
+	eeprom_update_byte(&ee_cfg.buzzer_volume, cfg.buzzer_volume);
 
 	//NVM EE power reduction mode
 	NVM.CTRLB |= 0b00000010;
@@ -113,7 +113,7 @@ void StoreVolume()
 void StoreLift()
 {
 	eeprom_busy_wait();
-	eeprom_write_byte(&ee_prof[cfg.selected_profile].lift_treshold, prof.lift_treshold);
+	eeprom_update_byte(&ee_prof[cfg.selected_profile].lift_treshold, prof.lift_treshold);
 
 	//NVM EE power reduction mode
 	NVM.CTRLB |= 0b00000010;
@@ -122,7 +122,7 @@ void StoreLift()
 void StoreSink()
 {
 	eeprom_busy_wait();
-	eeprom_write_byte(&ee_prof[cfg.selected_profile].sink_treshold, prof.sink_treshold);
+	eeprom_update_byte(&ee_prof[cfg.selected_profile].sink_treshold, prof.sink_treshold);
 
 	//NVM EE power reduction mode
 	NVM.CTRLB |= 0b00000010;
