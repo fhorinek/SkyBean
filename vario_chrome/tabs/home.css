@@ -27,3 +27,26 @@ webview.fb_window
     font-size: 10pt;
     font-weight: bold;
 }
+
+div#home_popup_load_from_skybean
+{
+    position: fixed;
+    float: none;
+    top: 50%;
+    left: 50%;
+    z-index: 100;
+    
+    background-color: white;
+    
+    margin-left: -250px;
+    width: 500px;
+    margin-top: -125px;
+    height: 250px;
+    
+    padding: 20px;
+    
+    box-shadow: 0 0 50px black;
+    border: 1px solid gray;
+    
+    display: none;
+}

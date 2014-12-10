@@ -13,5 +13,5 @@
       "scripts": ["js/main.js"]
     }
   },
-  "permissions": ["serial", "webview"]
+  "permissions": ["serial", "webview",  {"fileSystem": ["write", "retainEntries", "directory"]}]
 }

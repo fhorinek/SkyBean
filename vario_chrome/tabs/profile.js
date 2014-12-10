@@ -1,10 +1,6 @@
-var vario_freq = [127, 131.5, 136, 141, 146, 152.5, 159, 167, 175, 186.5, 198, 216, 234, 258.5, 283, 313.5, 344, 379.5, 415, 489.5, 564, 632.5, 701, 744.5, 788, 817, 846, 870, 894, 910.5, 927, 941, 955, 970, 985, 996.5, 1008, 1022.5, 1037, 1053.5, 1070,];
-var vario_leng = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 540, 489, 438, 403, 368, 340, 312, 285.5, 259, 239, 219, 197.5, 176, 157, 138, 124, 110, 95.5, 81, 70.5, 60,];
-var vario_paus = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 320, 281, 242, 215.5, 189, 172, 155, 144.5, 134, 124.5, 115, 105, 95, 85, 75, 65, 55, 46, 37, 33.5, 30,];
-
 function profile_get_near(findex, src)
 {
-    index = Math.floor(findex) + 12;
+    index = Math.floor(findex) + 20;
     m = findex - Math.floor(findex);
     if (index < 0)
     {
@@ -12,9 +8,9 @@ function profile_get_near(findex, src)
         m = 0;
     }
     
-    if (index > 23)
+    if (index > 41)
     {
-        index = 23;
+        index = 41;
         m = 1;
     }
     
@@ -24,6 +20,7 @@ function profile_get_near(findex, src)
     return start + diff * m;
 }
 
+var profile_id = 0;
 
 
 function profile_redraw()
@@ -34,12 +31,12 @@ function profile_redraw()
 
     for (i = -20; i <= 20; i++) // step is 0.5m
     {
-        plot_freq.push([i / 2, vario_freq[i + 20]]);
-        plot_leng.push([i / 2, vario_leng[i + 20]]);
-        plot_paus.push([i / 2, vario_paus[i + 20]]);
+        plot_freq.push([i / 2, actual_prof[profile_id].buzzer_freq[i + 20]]);
+        plot_leng.push([i / 2, actual_prof[profile_id].buzzer_length[i + 20]]);
+        plot_paus.push([i / 2, actual_prof[profile_id].buzzer_pause[i + 20]]);
     }  
 
-    $.plot("#plot", [
+    var plot = $.plot("#plot", [
             {data: plot_freq, label: "Frequency [Hz]"},
             {data: plot_leng, label: "Length [ms]", yaxis: 2},
             {data: plot_paus, label: "Pause [ms]", yaxis: 2}
@@ -64,11 +61,55 @@ function profile_redraw()
             },
             grid: {
                 hoverable: true,
-                clickable: true
+                clickable: true,
+                autoHighlight: false
             }
         });
 
+
+    for (i in point_lock_freq)
+        plot.highlight(0, point_lock_freq[i]);
+    for (i in point_lock_length)
+        plot.highlight(1, point_lock_length[i]);
+    for (i in point_lock_pause)
+        plot.highlight(2, point_lock_pause[i]);
+
 }
+
+function find_index(right, point_index, series_index)
+{
+    res = Array();
+
+    id = point_index;
+
+    if (series_index == 0)
+        lock = point_lock_freq;
+    if (series_index == 1)
+        lock = point_lock_length;
+    if (series_index == 2)
+        lock = point_lock_pause;
+
+    while(true)
+    {
+        id = id + (right ? 1 : -1);
+        
+        if (id < 0 || id > 40)
+            break;
+
+        res.push(id);
+        
+        state = lock.indexOf(id) != -1;
+        if (state)
+            break;
+    }
+
+    console.log(res);
+    return res;
+}
+
+var point_lock_freq;
+var point_lock_length;
+var point_lock_pause;
 
 function profile_init_plot()
 {
@@ -78,6 +119,22 @@ function profile_init_plot()
 	var point_index;
 	var data_x;
 	var data_y;
+
+	point_lock_freq = [5, 10, 15, 20, 25, 30, 35];    
+    point_lock_length = [5, 10, 15, 20, 25, 30, 35];
+    point_lock_pause = [5, 10, 15, 20, 25, 30, 35];
+
+    $("#profile_enable").click(function(){
+        actual_prof[profile_id].enabled = $("#profile_enable").is(":checked");
+    });
+
+    $("#profile_name").change( function(){
+        name = $("#profile_name").val()
+        name.slice(0,16);
+        $("#profile_name").val(name);
+
+        actual_prof[profile_id].name = name;
+    });
 
     $("#plot").bind("mousedown", function (event, pos, item) {
         if (on_point)
@@ -104,12 +161,56 @@ function profile_init_plot()
             if (pos_y < 0)
                 pos_y = 0;
         
+
             if (series_index == 0)
-                vario_freq[point_index] = pos_y;
+                field = actual_prof[profile_id].buzzer_freq;
             if (series_index == 1)
-                vario_leng[point_index] = pos_y;
+                field = actual_prof[profile_id].buzzer_length;
             if (series_index == 2)
-                vario_paus[point_index] = pos_y;
+                field = actual_prof[profile_id].buzzer_pause;
+
+            console.log("point is:" + point_index);
+            left_index = find_index(false, point_index, series_index);
+            right_index = find_index(true, point_index, series_index);
+
+            field[point_index] = pos_y;
+
+            start_i = left_index.pop();
+            a = field[start_i];
+            b = field[point_index];
+            diff = b - a;
+
+            for (i in left_index)
+            {
+                //"1" + 1 == "11"
+                //"1" - 1 == 0
+                m = (parseInt(i) + 1) / (left_index.length + 1)
+                field[left_index[i]] = a + diff * (1-m);
+            }
+
+            start_i = right_index.pop();
+            a = field[start_i];
+            b = field[point_index];
+            diff = b - a;
+
+            for (i in right_index)
+            {
+                m = (parseInt(i) + 1) / (right_index.length + 1)
+                field[right_index[i]] = a + diff * (1-m);
+            }
+
+            if (series_index == 0)
+                lock = point_lock_freq;
+            if (series_index == 1)
+                lock = point_lock_length;
+            if (series_index == 2)
+                lock = point_lock_pause;
+
+            if (lock.indexOf(point_index) == -1)
+            {
+                lock.push(point_index);
+                console.log(lock);
+            }
                 
             profile_redraw(point_index);
         }
@@ -119,10 +220,11 @@ function profile_init_plot()
             on_point = true;
             series_index = item.seriesIndex;
             point_index = item.dataIndex;
-
         }
         else
+        {
             on_point = false;
+        }
    });
    
    profile_redraw();
@@ -147,19 +249,14 @@ function tab_profile_init()
             resizeTimer = setTimeout(profile_resize, 100);    
         }
     });
-	    
-    row = document.createElement("tr");
-    for (i = 0; i < 41; i++)
-    {
-        td = document.createElement("td");
-        lock = document.createElement("input");
-        $(lock).attr("type", "checkbox");
-        $(td).append(lock);  
-        
-        $(row).append(td);
-    }
-    
-    $("#plot_table").append(row);
-    
 }
 
+function tab_profile_show(opt)
+{
+    profile_id = opt;
+
+    profile_resize();
+
+    $("#profile_name").val(actual_prof[profile_id].name);
+    $('#profile_enable').prop("checked", actual_prof[profile_id].enabled);
+}

@@ -69,11 +69,22 @@ div.tab_inactive
     right: 0;
     left: 100px;
     margin-left: 20px;
+    overflow-x: auto;
 }
 
 .ui-spinner-input
 {
     padding: 4px 4px;
     width: 65px;
+    text-align: right;
+}
+
+div.menu_links_bottom
+{
+    position: absolute;   
+    height: 15px;
+    bottom: 20px;
+    right: 20px;
+    width: 100%;
     text-align: right;
 }
