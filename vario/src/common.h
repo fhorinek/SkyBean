@@ -20,8 +20,8 @@ void StoreVolume();
 void StoreLift();
 void StoreSink();
 
-void init_sys_tick();
-uint32_t get_sys_tick();
+void sys_tick_init();
+uint32_t sys_tick_get();
 
 extern profile prof;
 extern configuration cfg;

@@ -9,6 +9,8 @@ Welcome to SkyBean configurator ...
 <input type="button" value="Save configuration to SkyBean" id="home_button_save_to_skybean" /><br />
 <input type="button" value="Save configuration to file" id="home_button_save_to_file" /><br />
 
+<input type="button" value="Update firmware" id="home_button_program" /><br />
+
 <div id="home_popup_load_from_skybean">
 
     <h3>Load configuration from SkyBean</h3>
@@ -30,12 +32,13 @@ Welcome to SkyBean configurator ...
             </div>
         </div>
 
+        <br>
+        <div id="progressbar"><div class="progress-label">Loading...</div></div>
 
         <br>
         <div class="menu_links_bottom">
             <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
-            <a id="reset_wizard" class="menu_links"  href="#">Reset wizard</a>
-            <a id="home_load_from_skybean_wizard_cancel" class="menu_links"  href="#">Cancel</a>
+            <a id="home_load_from_skybean_wizard_cancel" class="menu_links"  href="#">Close</a>
         </div>
     </div> 
     
@@ -52,7 +55,7 @@ Welcome to SkyBean configurator ...
         <br>
         <div class="menu_links_bottom">        
             <a id="yes_wizard" class="menu_links" href="#">I don't know what to do.</a>
-            <a id="home_load_from_skybean_manual_cancel" class="menu_links"  href="#">Cancel</a>        
+            <a id="home_load_from_skybean_manual_cancel" class="menu_links"  href="#">Close</a>        
         </div>
     </div>
    

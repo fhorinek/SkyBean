@@ -69,7 +69,7 @@ void LoadEEPROM()
 	Check(cfg.buzzer_volume, 1, 4, 4);
 	Check(cfg.supress_startup, 0, 1, 0);
 	Check(cfg.auto_poweroff, 0, 3600, 60 * 5);
-	Check(cfg.serial_output, 0, 0, 0);
+	Check(cfg.serial_output, 0, 10, 0);
 	Check(cfg.selected_profile, 0, 2, 0);
 	for (uint8_t i = 0; i < 5; i++)
 	{
@@ -135,13 +135,13 @@ ISR(rtc_overflow_interrupt)
 }
 
 //1ms system timer for crude timing (button, battery measurement, etc...)
-void init_sys_tick()
+void sys_tick_init()
 {
 	RtcInit(rtc_1000Hz_ulp, rtc_div1);
 	RtcEnableInterrupts(rtc_overflow);
 }
 
-uint32_t get_sys_tick()
+uint32_t sys_tick_get()
 {
 	uint16_t act = RtcGetValue();
 

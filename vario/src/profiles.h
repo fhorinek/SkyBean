@@ -8,9 +8,15 @@
 #ifndef PROFILES_H_
 #define PROFILES_H_
 
+#include <avr/io.h>
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+#define CFG_SERIAL_OUTPUT_NONE	0
+#define CFG_SERIAL_OUTPUT_DIGI	1
+#define CFG_SERIAL_OUTPUT_DEBUG	2
 
 struct profile
 {
@@ -53,6 +59,8 @@ struct configuration
 };								//49
 
 typedef struct configuration configuration;
+
+void configurator_loop();
 
 #ifdef  __cplusplus
 }

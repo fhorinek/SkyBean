@@ -46,7 +46,7 @@ void battery_step()
 	if (sound_duration > 0)
 		return;
 
-	if (battery_next_meas > get_sys_tick())
+	if (battery_next_meas > sys_tick_get())
 		return;
 
 	switch (battery_meas_state)
@@ -64,7 +64,7 @@ void battery_step()
 
 		battery_meas_state = BATT_START;
 		//measure every minute
-		battery_next_meas = get_sys_tick() + 60000;
+		battery_next_meas = sys_tick_get() + 60000;
 		meas_acc = 0;
 		meas_cnt = 0;
 

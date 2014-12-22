@@ -104,6 +104,7 @@ void Setup()
 	GpioRemap(&PORTD, gpio_remap_usart);
 	GpioRemap(&PORTC, gpio_remap_timerA | gpio_remap_timerB | gpio_remap_timerC | gpio_remap_timerD);
 
+	//configure uart & communicate with the
 	pc_init();
 
 	//enable i2c pull-ups
@@ -129,7 +130,7 @@ void Setup()
 
 	i2c.InitMaster(i2cC, 100000ul, 8, 8);
 
-	init_sys_tick();
+	sys_tick_init();
 
 	battery_init();
 

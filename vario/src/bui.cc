@@ -37,12 +37,12 @@ void button_task()
 	{
 		if (button_state == BUTTON_IDLE)
 		{
-			button_pressed_start = get_sys_tick();
+			button_pressed_start = sys_tick_get();
 			button_delta = 0;
 			button_state = BUTTON_PRESSED;
 		}
 		else
-			button_delta = get_sys_tick() - button_pressed_start;
+			button_delta = sys_tick_get() - button_pressed_start;
 	}
 	else
 	//relased
@@ -400,7 +400,7 @@ volatile int16_t auto_start_value = 0;
 
 void auto_off_reset()
 {
-	auto_start_time = get_sys_tick();
+	auto_start_time = sys_tick_get();
 	auto_start_value = altitude0;
 }
 
@@ -415,7 +415,7 @@ void auto_off_step()
 	}
 	else
 	{
-		if ((uint32_t)get_sys_tick() - (uint32_t)auto_start_time > (uint32_t)(cfg.auto_poweroff * 1000))
+		if ((uint32_t)sys_tick_get() - (uint32_t)auto_start_time > ((uint32_t)cfg.auto_poweroff * 1000))
 		{
 			start_sound(SOUND_OFF);
 		}
@@ -443,7 +443,7 @@ void bui_step()
 	if (sound_duration > 0)
 	{
 		//but reset wait timer
-		next_step_wait = get_sys_tick();
+		next_step_wait = sys_tick_get();
 		return;
 	}
 
@@ -487,7 +487,7 @@ void bui_step()
 			{
 				//second click -> go to menu
 				led_mode = LED_MODE_ALT;
-				next_step_wait = get_sys_tick();
+				next_step_wait = sys_tick_get();
 				bui_mode = BUI_MODE_UNLOCK;
 				bui_button_clear();
 			}
@@ -495,13 +495,13 @@ void bui_step()
 			{
 				//first click
 				first_click = true;
-				next_step_wait = get_sys_tick();
+				next_step_wait = sys_tick_get();
 				bui_button_clear();
 			}
 		}
 
 		//too slow, reset click state
-		if (get_sys_tick() - next_step_wait > BUI_SHORT_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_SHORT_WAIT && button_state == BUTTON_IDLE)
 		{
 			first_click = false;
 		}
@@ -518,7 +518,7 @@ void bui_step()
 			bui_button_clear();
 			volume_toggle();
 			auto_off_reset();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//visual feedback for entering lift & sink menu
@@ -530,13 +530,13 @@ void bui_step()
 		//next step is to choose lift or sink menu
 		if (bui_was_long())
 		{
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 			bui_mode = BUI_MODE_SETTINGS;
 			bui_button_clear();
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -559,7 +559,7 @@ void bui_step()
 			bui_button_clear();
 			led_mode = LED_MODE_G_ON;
 			start_sound(SOUND_LIFT);
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//second click was long -> sink menu
@@ -570,11 +570,11 @@ void bui_step()
 			bui_button_clear();
 			led_mode = LED_MODE_R_ON;
 			start_sound(SOUND_SINK);
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -590,7 +590,7 @@ void bui_step()
 		if (bui_was_short())
 		{
 			bui_button_clear();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 
 			prof.lift_treshold++;
 			if (prof.lift_treshold > 5)
@@ -612,7 +612,7 @@ void bui_step()
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -628,7 +628,7 @@ void bui_step()
 		if (bui_was_short())
 		{
 			bui_button_clear();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 
 			prof.sink_treshold++;
 			if (prof.sink_treshold > 5)
@@ -650,7 +650,7 @@ void bui_step()
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;

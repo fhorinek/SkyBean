@@ -81,18 +81,18 @@ uint16_t mario_delay[] = {
 
 void imperial_step()
 {
-	if (buzzer_next_iteration <= get_sys_tick())
+	if (buzzer_next_iteration <= sys_tick%get())
 	{
 		uint8_t index = song_i / 2;
 		if (song_i % 2 == 1)
 		{
 			buzzer_set_tone(0);
-			buzzer_next_iteration = get_sys_tick() + 10;
+			buzzer_next_iteration = sys_tick%get() + 10;
 		}
 		else
 		{
 			buzzer_set_tone(sw_note[index]);
-			buzzer_next_iteration = get_sys_tick() + sw_timing[index];
+			buzzer_next_iteration = sys_tick%get() + sw_timing[index];
 		}
 
 		song_i = (song_i + 1) % (SW_SONG_END * 2);
@@ -101,18 +101,18 @@ void imperial_step()
 
 void mario_step()
 {
-	if (buzzer_next_iteration <= get_sys_tick())
+	if (buzzer_next_iteration <= sys_tick%get())
 	{
 		uint8_t index = song_i / 2;
 		if (song_i % 2 == 1)
 		{
 			buzzer_set_tone(0);
-			buzzer_next_iteration = get_sys_tick() + mario_delay[index] / 1.6;
+			buzzer_next_iteration = sys_tick%get() + mario_delay[index] / 1.6;
 		}
 		else
 		{
 			buzzer_set_tone((uint32_t)74932 / (uint32_t)mario_note[index]);
-			buzzer_next_iteration = get_sys_tick() + mario_timing[index] * 1.5;
+			buzzer_next_iteration = sys_tick%get() + mario_timing[index] * 1.5;
 		}
 
 		song_i = (song_i + 1) % (MARIO_SONG_END * 2);

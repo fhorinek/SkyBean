@@ -9,6 +9,9 @@ var pstates = {
     download_done:      7,
     upload_done:        8,
     error:              9,
+    fw_prog:            10,
+    fw_verify:          11,
+    fw_done:            12,
 };
 
 var pcmd = {
@@ -16,8 +19,18 @@ var pcmd = {
     get_version:        1,
     write_cfg:          2,
     read_cfg:           3,
+    prog_reset:         4,
+    prog_version:       5,
+    prog_erase:         6,
+    prog_upload:        7,
+    prog_verify:        8,
 };
 
+
+function chr(n)
+{
+    return String.fromCharCode(n);
+}
 
 function PortHandler()
 {
@@ -25,6 +38,7 @@ function PortHandler()
     this.port_info = null;
     this.old_ports = false;
     this.task = false;
+    this.prog_size = 128;
 
     chrome.serial.onReceive.addListener(function (info){
         data = new Uint8Array(info.data);
@@ -44,6 +58,7 @@ function PortHandler()
     this.setState = function(state)
     {
         this.state = state;
+        console.log("state is " + this.state);
         //place for gui handlers
         update_port_state(state);
     };
@@ -75,20 +90,24 @@ function PortHandler()
     {
         console.log("Opening " + port);
 
-        this.init_parser();
-        chrome.serial.connect(port, {bitrate: 9600}, function(info) {
+
+        chrome.serial.connect(port, {bitrate: 115200}, function(info) {
             console.log("port opened");
             console.log(info);
             port_handler.port_info = info;
             port_handler.setState(pstates.wait_for_device);
 
+            if (port_handler.task == pcmd.prog_upload)
+                port_handler.startProg();
+            else
+                this.init_parser();
         });
 
-    }
+    };
 
     this.updatePortsWizard = function(new_ports)
     {
-        if (this.state != pstates.auto_com)
+        if (port_handler.state != pstates.auto_com)
             return;
 
         function in_array(obj, array)
@@ -145,13 +164,19 @@ function PortHandler()
             $("#port_selector").append("<option disabled>No COM ports found</option>");        
     };
 
-    this.send = function(str)
+    this.send = function(str, callback)
     {
         data = convertStringToArrayBuffer(str)
 
-        chrome.serial.send(this.port_info.connectionId, data, function() {
-            console.log("data send");
-        });
+        if (callback === undefined)
+        {
+            callback = function() {
+                console.log("data send");
+            }
+
+        }
+
+        chrome.serial.send(this.port_info.connectionId, data, callback);
     };
 
     this.init_parser = function() 
@@ -160,12 +185,13 @@ function PortHandler()
         this.parser_cmd = pcmd.wait_for_hello;
         this.parser_debug = "";
         this.vario_version = 0;
-    }
+    };
 
     this.parse = function(c)
     {
         this.parser_debug += c;
         parser_hello_str = "skybean";
+        parser_btl_str = "bootloader";
 
         switch (this.parser_cmd)
         {
@@ -225,6 +251,7 @@ function PortHandler()
                         data_cfg += encode_prof(actual_prof[1]);
                         data_cfg += encode_prof(actual_prof[2]);        
                         
+                        console.log(data_cfg.length);
                         // this.send(data_cfg);     
 
                         this.tx_cnt = 0;   
@@ -240,8 +267,9 @@ function PortHandler()
 
                         console.log("CALC CRC is " + crc);
 
-                        this.send(data_cfg);  
-
+                        this.data_to_send = data_cfg;
+                        this.send(this.data_to_send[0]);  
+                        this.data_to_send = this.data_to_send.slice(1);
                     }
                 }
             break;               
@@ -319,6 +347,11 @@ function PortHandler()
                 if (c == '.')
                 {
                     this.tx_cnt++;
+                    if (this.data_to_send.length > 0)
+                    {
+                        this.send(this.data_to_send[0]); 
+                        this.data_to_send = this.data_to_send.slice(1);
+                    }
                 }
 
                 if (c == 'e')
@@ -328,25 +361,284 @@ function PortHandler()
                     this.parser_buffer = "";
                     this.closePort(); 
 
-                    this.setState(pstates.error);
+                    this.setState(pstates.idle);
                 }
 
             break;
+
+            case(pcmd.prog_reset):
+                if (c == parser_btl_str.charAt(this.parser_buffer.length))
+                {
+                    this.parser_buffer += c;
+                    if (this.parser_buffer == parser_btl_str)
+                    {
+                        console.log("bootloader entered");
+                        this.parser_cmd = pcmd.prog_version;
+                        this.parser_buffer = "";
+                    }
+                }
+                else
+                {
+                    this.parser_buffer = "";
+                }
+            break;  
+
+            case(pcmd.prog_version):
+                this.parser_buffer += c;
+                if (this.parser_buffer.length == 2)
+                {
+                    ver = this.parser_buffer.charCodeAt(0) << 8;
+                    ver += this.parser_buffer.charCodeAt(1);
+
+                    console.log("Erasing app");
+                    this.parser_cmd = pcmd.prog_erase;
+                    this.parser_buffer = "";          
+                    this.send("e");          
+                }
+            break;
+
+            case(pcmd.prog_erase):
+                if (c == 'd')
+                {
+                    console.log("Erasing done");
+
+                    this.prog_pos = 0;
+                    this.parser_cmd = pcmd.prog_upload;
+
+                    //start program upload
+                    this.progNextBlock();
+                }
+            break;
+
+
+            case(pcmd.prog_upload):
+                if (c == 'd')
+                {
+                    console.log("Block " + this.prog_pos + " done");
+
+                    if (this.prog_pos >= fw_bin.length)
+                    {
+                        //start verification
+                        console.log("Verification start");
+                        this.prog_pos = 0;
+                        this.parser_cmd = pcmd.prog_verify;
+                        this.parser_buffer = "";
+                        this.verifyNextBlock();
+                    }
+                    else
+                        this.progNextBlock();
+                }
+            break;
+
+            case(pcmd.prog_verify):
+                this.parser_buffer += c;
+                //console.log("got " + this.parser_buffer.length);
+                if (this.parser_buffer.length == this.prog_size)
+                {
+                    fail = false;
+
+                    for (i = 0; i < this.prog_size; i++)
+                    {
+                        if (this.prog_pos + i >= fw_bin.length)
+                        {
+                            if (this.parser_buffer[i] != chr(0xFF))
+                            {
+                                console.log("Error at " + (this.prog_pos + i) + " got [" + this.parser_buffer.charCodeAt(i) + "] but 0xFF expected!");
+                                fail = true;
+                                break;
+                            }                                
+
+                        }
+                        else
+                        {
+                            if (this.parser_buffer[i] != fw_bin[this.prog_pos + i])
+                            {
+                                console.log("Error at " + (this.prog_pos + i) + " got [" + this.parser_buffer.charCodeAt(i) + "] but " + fw_bin.charCodeAt(this.prog_pos + i) + " expected!");
+                                fail = true;
+                                break;
+                            }
+                        }
+
+                    }
+
+                    if (fail)
+                    {
+                        console.log("Verification error");
+                        this.closePort();   
+                        break;
+                    }
+
+                    //continue verification
+                    this.prog_pos += this.prog_size;
+                    if (this.prog_pos > fw_bin.length)
+                    {
+                        console.log("Verification done");
+                        this.send("b", function(){
+                            this.closePort();    
+                        });
+                    }
+                    else
+                    {
+                        console.log("block " + this.prog_pos + " ok");
+                        this.parser_buffer = "";   
+                        this.verifyNextBlock();                                  
+                    }
+
+                }
+            break
 
         }     
 
     };
 
 
+    this.progNextBlock = function()
+    {
+        text = "p";
+        adr = this.prog_pos
+
+        text += chr((adr & 0x0000FF) >> 0);
+        text += chr((adr & 0x00FF00) >> 8);
+        text += chr((adr & 0xFF0000) >> 16);
+
+        max_size = this.prog_size;
+
+        size = fw_bin.length - this.prog_pos;
+        if (size > max_size)
+            size = max_size
+
+
+        wsize = size / 2;
+        text += chr((wsize & 0x00FF) >> 0);
+        text += chr((wsize & 0xFF00) >> 8);
+
+        for (i = 0; i < size; i++)
+        {
+            text += fw_bin[this.prog_pos + i];
+        }
+
+        this.send(text);
+
+        // debug_stream(text);
+
+        this.prog_pos += size;
+    };
+
+    this.verifyNextBlock = function()
+    {
+        text = "r";
+        adr = this.prog_pos
+
+        text += chr((adr & 0x0000FF) >> 0);
+        text += chr((adr & 0x00FF00) >> 8);
+        text += chr((adr & 0xFF0000) >> 16);
+
+        size = this.prog_size;
+        text += chr((size & 0x00FF) >> 0);
+        text += chr((size & 0xFF00) >> 8);
+
+        this.send(text);
+        // debug_stream(text);
+    };
+
+    this.reset = function()
+    {
+        if (this.parser_cmd != pcmd.prog_reset)
+            return;
+
+        this.send("ebl");
+
+        setTimeout(function() {
+            port_handler.reset();
+        }, 100);      
+    };
+
+    this.startProg = function()
+    {
+        this.parser_cmd = pcmd.prog_reset;
+
+        this.parser_buffer = "";
+        this.parser_debug = "";
+
+        this.reset();
+    };
+
     this.closePort = function()
     {
-        chrome.serial.disconnect(this.port_info.connectionId, function(){
-            console.log("Port closed");
+        if (this.port_info != null)
+        {
+            chrome.serial.disconnect(this.port_info.connectionId, function(){
+                console.log("Port closed");
+                port_handler.setState(pstates.idle);
+                this.port_info == null;
+            });
+        }
+        else
+        {
             port_handler.setState(pstates.idle);
-        });
+        }
     };
 }
 
+var file_base = "http://glados.horinek.sk/home/~horinek/skybean/";
+var xhr = new XMLHttpRequest();
+
+var fw_list = {};
+
+var fw_bin = null;
+var fw_build = 0;
+var fw_md5 = "";
+var fw_file = "";
+
+function get_list()
+{   
+    xhr.open("GET", file_base, true);
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+          fw_list = JSON.parse(xhr.responseText);
+          console.log(fw_list);
+          console.log(xhr.responseText);
+      }
+    }
+    xhr.send();
+}
+
+
+function get_fw(id)
+{   
+    fw_md5 = fw_list[id].md5;
+    fw_file = fw_list[id].file;
+    fw_build = id;
+    fw_bin = null;
+
+    xhr.open("GET", file_base + "?file=" + fw_file, true);
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+        tmp = xhr.responseText;
+        calc = md5(tmp);
+
+        if (calc == fw_md5)
+        {
+            fw_bin = atob(tmp);
+            console.log("md5 ok");
+        }
+        else
+        {
+            console.log("md5 check fail");
+        }
+
+      }
+    }
+    xhr.send();
+}
+
+function store_fw()
+{
+    if (fw_bin == null)
+        return;
+}
 
 function update_port_state(state)
 {
@@ -384,7 +676,7 @@ function update_port_state(state)
         case(pstates.error):
             $("#port_wizard_text").html("Error");
             $("#port_wizard_desc").html("There was an error during transfer please try again");
-            $("loader").hide();
+            $(".loader").hide();
         break;       
         case(pstates.upload_cfg):
             $("#port_wizard_text").html("Uploading configuration");
@@ -433,7 +725,8 @@ function debug_stream(stream)
     arr = [];    
     for (i = 0; i < stream.length; i++)
     {
-        arr.push(stream.charCodeAt(i));
+//        arr.push(stream.charCodeAt(i));
+        arr.push(stream[i]);
     }
     console.log(arr);
 }
@@ -444,6 +737,9 @@ function tab_home_init()
 {
     set_defult_configuration();
 
+   $( "#progressbar" ).progressbar({
+      value: false
+    });
 
     $("#home_button_load_from_skybean").click(function(){
         port_handler.startWizard(pcmd.read_cfg);
@@ -459,10 +755,6 @@ function tab_home_init()
         });
     });    
 
-    $("#reset_wizard").click(function(){
-        port_handler.startWizard()
-    });
-    
     $("#no_wizard").click(function(){
         $("#port_wizard").hide();
         $("#port_manual").show();
@@ -489,11 +781,13 @@ function tab_home_init()
 
     $("#home_load_from_skybean_wizard_cancel").click(function(){
         // stop_wizard();
+        port_handler.closePort();
         $("#home_popup_load_from_skybean").fadeOut();
     });
 
     $("#home_load_from_skybean_manual_cancel").click(function(){
         // stop_wizard();
+        port_handler.closePort();
         $("#home_popup_load_from_skybean").fadeOut();
     });
 
@@ -505,6 +799,8 @@ function tab_home_init()
     $("#home_button_load_from_file").click(function(){
         load_from_file();
     });
+
+    get_list();
 }
 
 
