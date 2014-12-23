@@ -128,6 +128,24 @@ void StoreSink()
 	NVM.CTRLB |= 0b00000010;
 }
 
+void LoadProfile()
+{
+	eeprom_busy_wait();
+	eeprom_update_byte(&ee_cfg.selected_profile, cfg.selected_profile);
+
+	eeprom_read_block(&prof, &ee_prof[cfg.selected_profile], sizeof(prof));
+	for (uint8_t i = 0; i < 41; i++)
+	{
+		//todo: fallback table
+		Check(prof.buzzer_freq[i], 0, 2000, 100);
+		Check(prof.buzzer_pause[i], 0, 2000, 100);
+		Check(prof.buzzer_length[i], 0, 2000, 100);
+	}
+	Check(prof.lift_treshold, 0, 5, 1);
+	Check(prof.sink_treshold, 0, 5, 1);
+
+	Check(prof.enabled, 0, 1, 1);
+}
 
 ISR(rtc_overflow_interrupt)
 {

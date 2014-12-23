@@ -19,6 +19,7 @@ void LoadEEPROM();
 void StoreVolume();
 void StoreLift();
 void StoreSink();
+void LoadProfile();
 
 void sys_tick_init();
 uint32_t sys_tick_get();

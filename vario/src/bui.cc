@@ -30,6 +30,8 @@ void bui_init()
 	LEDG_OFF
 }
 
+bool pressed_from_begining = true;
+
 void button_task()
 {
 	//pressed
@@ -50,6 +52,7 @@ void button_task()
 		if (button_state == BUTTON_PRESSED || button_state == BUTTON_WAITING)
 			button_state = BUTTON_IDLE;
 
+		pressed_from_begining = false;
 	}
 }
 
@@ -105,6 +108,7 @@ void bui_button_clear()
 #define BUI_MODE_LIFT		2
 #define BUI_MODE_SINK		3
 #define BUI_MODE_UNLOCK		4
+#define BUI_MODE_PROFILE	5
 
 #define BUI_SHORT_WAIT		300
 #define BUI_WAIT			3000
@@ -320,6 +324,7 @@ void LiftSinkRefresh()
 #define LED_MODE_G_ON	4
 #define LED_MODE_R_ON	5
 #define LED_MODE_BOTH	6
+#define LED_MODE_BLINK	7
 
 uint8_t blik = 0;
 uint8_t led_mode = LED_MODE_IDLE;
@@ -349,6 +354,20 @@ void led_task()
 		case(LED_MODE_R_ON):
 			LEDG_OFF
 			LEDR_ON
+		break;
+
+		//both blinking (for profile select)
+		case(LED_MODE_BLINK):
+			if (blik % 10 < 5)
+			{
+				LEDR_ON
+				LEDG_ON
+			}
+			else
+			{
+				LEDG_OFF
+				LEDR_OFF
+			}
 		break;
 
 		//alternate blinking (for menu)
@@ -424,6 +443,7 @@ void auto_off_step()
 
 bool first_click = false;
 
+
 //BUI loop
 // - button user interface :-)
 void bui_step()
@@ -472,11 +492,23 @@ void bui_step()
 
 	//idle
 	case(BUI_MODE_IDLE):
+
 		if (bui_is_extra_long())
 		{
-			//power off
-			start_sound(SOUND_OFF);
-			bui_button_clear();
+			if (pressed_from_begining)
+			{
+				//button is still pressed -> go to profile setup
+				next_step_wait = sys_tick_get();
+				bui_mode = BUI_MODE_PROFILE;
+				play_cfg = true;
+				bui_button_clear();
+			}
+			else
+			{
+				//power off
+				start_sound(SOUND_OFF);
+				bui_button_clear();
+			}
 		}
 
 
@@ -655,6 +687,42 @@ void bui_step()
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
 			StoreSink();
+		}
+	break;
+
+	//sink menu
+	case(BUI_MODE_PROFILE):
+		led_mode = LED_MODE_BLINK;
+
+		//toggle configuration on short click
+		if (bui_was_short())
+		{
+			bui_button_clear();
+			next_step_wait = sys_tick_get();
+
+			cfg.selected_profile++;
+			if (cfg.selected_profile > 2)
+				cfg.selected_profile = 0;
+
+			play_cfg = true;
+		}
+
+		//the menu was just opened or changed
+		// playback the actual configuration
+		if (play_cfg)
+		{
+			play_cfg = false;
+			beep_count = cfg.selected_profile + 1;
+			beep_blik = BEEP_BLIK_BOTH;
+			start_sound(SOUND_BEEP);
+		}
+
+		//no action for a while, reset to idle state
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		{
+			bui_mode = BUI_MODE_IDLE;
+			led_mode = LED_MODE_IDLE;
+			LoadProfile();
 		}
 	break;
 

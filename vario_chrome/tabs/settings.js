@@ -121,7 +121,7 @@ function tab_settings_show()
         if (actual_prof[i].enabled)
         {
             option = document.createElement("option");
-            $(option).html(i + ": " + actual_prof[i].name);
+            $(option).html((i + 1) + ": " + actual_prof[i].name);
             $(option).val(i);
             $("#set_profile").append(option);
         }

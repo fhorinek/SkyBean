@@ -124,18 +124,6 @@ function profile_init_plot()
     point_lock_length = [5, 10, 15, 20, 25, 30, 35];
     point_lock_pause = [5, 10, 15, 20, 25, 30, 35];
 
-    $("#profile_enable").click(function(){
-        actual_prof[profile_id].enabled = $("#profile_enable").is(":checked");
-    });
-
-    $("#profile_name").change( function(){
-        name = $("#profile_name").val()
-        name.slice(0,16);
-        $("#profile_name").val(name);
-
-        actual_prof[profile_id].name = name;
-    });
-
     $("#plot").bind("mousedown", function (event, pos, item) {
         if (on_point)
         {
@@ -242,6 +230,27 @@ function tab_profile_init()
 
     var resizeTimer;
 
+
+    $("#profile_enable").click(function(){
+        actual_prof[profile_id].enabled = $("#profile_enable").is(":checked");
+    });
+
+    $("#profile_name").change( function(){
+        name = $("#profile_name").val()
+        name.slice(0,16);
+        $("#profile_name").val(name);
+
+        actual_prof[profile_id].name = name;
+    });
+
+    $("#profile_lift").on("change", function (){
+        actual_prof[profile_id].lift_treshold = $(this).val();
+    });
+
+    $("#profile_sink").on("change", function (){
+        actual_prof[profile_id].sink_treshold = $(this).val();
+    });
+
     $(window).resize(function (){
         if ($("#page_profile").is(":visible"))
         {
@@ -259,4 +268,26 @@ function tab_profile_show(opt)
 
     $("#profile_name").val(actual_prof[profile_id].name);
     $('#profile_enable').prop("checked", actual_prof[profile_id].enabled);
+
+    $("#profile_lift").empty();
+    for (i = 0; i < 5; i++)
+    {
+        option = document.createElement("option");
+        $(option).html((actual_cfg.lift_steps[i] / 100) + " m/s");
+        $(option).val(i);
+        $("#profile_lift").append(option);
+    }
+
+    $("#profile_lift").val(actual_prof[profile_id].lift_treshold);    
+
+    $("#profile_sink").empty();
+    for (i = 0; i < 5; i++)
+    {
+        option = document.createElement("option");
+        $(option).html((actual_cfg.sink_steps[i] / 100) + " m/s");
+        $(option).val(i);
+        $("#profile_sink").append(option);
+    }
+
+    $("#profile_sink").val(actual_prof[profile_id].sink_treshold);        
 }

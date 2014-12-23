@@ -1,17 +1,28 @@
-<!--webview class="fb_window" id="fb_window" src="https://rbf.nanodesign.sk/public/horinek/fb.html"></webview-->
+<webview class="fb_window" id="fb_window" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fvarioskybean&width&height=600&colorscheme=light&show_faces=false&header=true&stream=true&show_border=false&appId=856385571060120"></webview>
 
 <h1>Home</h1>
 Welcome to SkyBean configurator ...
 
+<div class="alert">
+    Beware this is early software release, proceed with caution! You need to update to beta firmware on SkyBean to use this configurator, but you can allways downgrade to previous stable release.
+</div>
+
+<div class="alert">
+    Report any problems or your suggestions to <a target="_blank" href="mailto:bugs@skybean.eu">bugs@skybean.eu</a>
+</div>
+
 <br>
 <input type="button" value="Load configuration from SkyBean" id="home_button_load_from_skybean" /><br />
-<input type="button" value="Load configuration from file" id="home_button_load_from_file" /><br />
 <input type="button" value="Save configuration to SkyBean" id="home_button_save_to_skybean" /><br />
+<br>
+<input type="button" value="Load configuration from file" id="home_button_load_from_file" /><br />
 <input type="button" value="Save configuration to file" id="home_button_save_to_file" /><br />
-
+<br>
+<input type="button" value="Reset configuration to default" id="home_button_reset" /><br />
+<br>
 <input type="button" value="Update firmware" id="home_button_program" /><br />
 
-<div id="home_popup_load_from_skybean">
+<div id="home_popup">
 
     <h3>Load configuration from SkyBean</h3>
 
@@ -59,6 +70,23 @@ Welcome to SkyBean configurator ...
         </div>
     </div>
    
+
+    <div id="firmware">
+        <select id="fw_select">
+            <option disabled>Unable to connect to update server</option>
+        </select>
+
+        <div>
+            <input type="button" id="fw_refresh" value="Refresh" />
+            <input type="button" id="fw_start" value="Upload to SkyBean" />        
+        </div>
+     
+        <br>
+        <div class="menu_links_bottom">        
+            <a id="home_firmware_cancel" class="menu_links"  href="#">Close</a>        
+        </div>
+    </div>
+
 </div>
 
 

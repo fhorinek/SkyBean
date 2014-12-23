@@ -4,8 +4,8 @@ webview.fb_window
     right: 0;
     top: 0;
     bottom: 0;
-    height: 100%;
     width: 350px;
+    height: 600px;
 }
 
 
@@ -28,7 +28,7 @@ webview.fb_window
     font-weight: bold;
 }
 
-div#home_popup_load_from_skybean
+div#home_popup
 {
     position: fixed;
     float: none;
@@ -51,13 +51,36 @@ div#home_popup_load_from_skybean
     display: none;
 }
 
-  .ui-progressbar {
+.ui-progressbar {
     position: relative;
-  }
-  .progress-label {
+}
+.progress-label {
     position: absolute;
     left: 50%;
     top: 4px;
     font-weight: bold;
     text-shadow: 1px 1px 0 #fff;
-  }
+}
+
+#progressbar
+{
+    display: none;
+}
+
+input[type=button]
+{         
+    width: 230px;
+    margin-top: 5px;
+    margin-left: 10px;
+    text-align: center;
+
+}
+
+div.alert
+{
+    font-size: 15pt;
+    margin: 15px;
+    color: #AA0000;
+    position: relative;
+    width: 400px;
+}

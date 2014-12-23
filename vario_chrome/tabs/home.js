@@ -12,6 +12,7 @@ var pstates = {
     fw_prog:            10,
     fw_verify:          11,
     fw_done:            12,
+    fw_get:             13,
 };
 
 var pcmd = {
@@ -698,13 +699,13 @@ function update_port_state(state)
 var actual_cfg = false;
 var actual_prof = false;
 
-function set_defult_configuration()
+function set_default_configuration()
 {
     actual_cfg = default_cfg();
     actual_prof = [default_prof(), default_prof(), default_prof()];
     
-    actual_prof[1].enabled = 0;
-    actual_prof[2].enabled = 0;    
+//     actual_prof[1].enabled = 0;
+//     actual_prof[2].enabled = 0;    
 }
 
 
@@ -735,7 +736,7 @@ var port_handler = new PortHandler();
 
 function tab_home_init()
 {
-    set_defult_configuration();
+    set_default_configuration();
 
    $( "#progressbar" ).progressbar({
       value: false
@@ -743,14 +744,14 @@ function tab_home_init()
 
     $("#home_button_load_from_skybean").click(function(){
         port_handler.startWizard(pcmd.read_cfg);
-        $("#home_popup_load_from_skybean").fadeIn(function(){
+        $("#home_popup").fadeIn(function(){
             
         });
     });
     
     $("#home_button_save_to_skybean").click(function(){
         port_handler.startWizard(pcmd.write_cfg);
-        $("#home_popup_load_from_skybean").fadeIn(function(){
+        $("#home_popup").fadeIn(function(){
             
         });
     });    
@@ -800,7 +801,16 @@ function tab_home_init()
         load_from_file();
     });
 
-    get_list();
+    $("#home_button_reset").click(function(){
+        set_default_configuration();
+    });
+
+    $("#home_button_program").click(function(){
+        get_list();
+        $("#home_popup").fadeIn(function(){
+            $("#firmware").show();
+        });        
+    });
 }
 
 
