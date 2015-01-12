@@ -8,6 +8,10 @@ webview.fb_window
     height: 600px;
 }
 
+#port_wizard
+{
+    display: none;
+}
 
 #port_manual
 {

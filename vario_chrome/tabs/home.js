@@ -13,6 +13,8 @@ var pstates = {
     fw_verify:          11,
     fw_done:            12,
     fw_get:             13,
+    fw_select:          14,
+    fw_download:        15,
 };
 
 var pcmd = {
@@ -593,14 +595,30 @@ var fw_file = "";
 
 function get_list()
 {   
+    update_port_state(pstates.fw_get);
     xhr.open("GET", file_base, true);
 
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState == 4) {
-          fw_list = JSON.parse(xhr.responseText);
-          console.log(fw_list);
-          console.log(xhr.responseText);
-      }
+    xhr.onreadystatechange = function() 
+    {
+        if (xhr.readyState == 4) 
+        {
+            fw_list = JSON.parse(xhr.responseText);
+            console.log(fw_list);
+            console.log(xhr.responseText);
+
+            select = $("#fw_select");
+            select.empty();
+
+            for (key in fw_list)
+            {
+                option = document.createElement("option");
+                $(option).val(key);
+                $(option).html(fw_list[key].file);
+                select.append(option);
+            }
+
+            update_port_state(pstates.fw_list);
+        }
     }
     xhr.send();
 }
@@ -613,6 +631,8 @@ function get_fw(id)
     fw_build = id;
     fw_bin = null;
 
+    update_port_state(pstates.fw_download);
+
     xhr.open("GET", file_base + "?file=" + fw_file, true);
 
     xhr.onreadystatechange = function() {
@@ -624,10 +644,12 @@ function get_fw(id)
         {
             fw_bin = atob(tmp);
             console.log("md5 ok");
+            port_handler.startWizard(pcmd.fw_prog);
         }
         else
         {
             console.log("md5 check fail");
+            update_port_state(pstates.error);
         }
 
       }
@@ -649,12 +671,14 @@ function update_port_state(state)
             $("#port_wizard_text").html("Looking for COM port");
             $("#port_wizard_desc").html("Connect USB interface board. If is the board allready connected disconnect the board and reconnect it again.");
             $(".loader").show();
-            $("#reset_wizard").hide();            
+            $("#reset_wizard").hide(); 
+            $("#port_wizard").show();         
         break;
         case(pstates.manual_com):
             $("#port_wizard_text").html("Manual COM selection");
             $("#port_wizard_desc").html("Select USB interface COM port.");
             $(".loader").hide();
+            $("#port_manual").show(); 
         break;
         case(pstates.wait_for_device):
             $("#port_wizard_text").html("Waiting for SkyBean");
@@ -691,8 +715,43 @@ function update_port_state(state)
             $("#port_wizard_text").html("Done");
             $("#port_wizard_desc").html("Configuration was sucesfully uploaded.");
             $(".loader").hide();
-        break;             
-        
+        break;   
+        case(pstates.fw_get):
+            $("#port_wizard_text").html("Updating");
+            $("#port_wizard_desc").html("Downloading index from update server.");
+            $(".loader").show();
+            $("#fw_refresh").hide();
+            $("#fw_start").hide();
+            $("#fw_select").hide();
+        break;   
+        case(pstates.fw_download):
+            $("#port_wizard_text").html("Downloading firmware");
+            $("#port_wizard_desc").html("Downloading selected firmware from update server.");
+            $(".loader").show();
+            $("#fw_refresh").hide();
+            $("#fw_start").hide();
+            $("#fw_select").hide();
+            $("#firmware").hide();
+        break;   
+        case(pstates.fw_list):
+            $("#port_wizard_text").html("Select firmware");
+            $("#port_wizard_desc").html("Choose what firmware shoud be uploaded to the SkyBean.");
+            $(".loader").hide();
+            $("#fw_refresh").show();
+            $("#fw_start").show();
+            $("#fw_select").show();
+        break; 
+        case(pstates.idle):
+            $("#port_wizard_text").html("");
+            $("#port_wizard_desc").html("");        
+            $(".loader").hide();
+            $("#fw_refresh").hide();
+            $("#fw_start").hide();
+            $("#fw_select").hide();      
+            $("#port_wizard").hide();
+            $("#port_manual").hide(); 
+            $("#firmware").hide();
+        break;  
     }
 }
 
@@ -737,6 +796,7 @@ var port_handler = new PortHandler();
 function tab_home_init()
 {
     set_default_configuration();
+    update_port_state(pstates.idle);
 
    $( "#progressbar" ).progressbar({
       value: false
@@ -783,13 +843,13 @@ function tab_home_init()
     $("#home_load_from_skybean_wizard_cancel").click(function(){
         // stop_wizard();
         port_handler.closePort();
-        $("#home_popup_load_from_skybean").fadeOut();
+        $("#home_popup").fadeOut();
     });
 
     $("#home_load_from_skybean_manual_cancel").click(function(){
         // stop_wizard();
         port_handler.closePort();
-        $("#home_popup_load_from_skybean").fadeOut();
+        $("#home_popup").fadeOut();
     });
 
     $("#home_button_save_to_file").click(function(){
@@ -811,14 +871,23 @@ function tab_home_init()
             $("#firmware").show();
         });        
     });
+
+    $("#fw_refresh").click(function(){
+        get_list();
+    });    
+
+    $(home_firmware_cancel).click(function(){
+        port_handler.closePort();
+        $("#home_popup").fadeOut();
+    });
+
+    $("#fw_start").click(function(){
+        get_fw($("#fw_select").val());
+        
+    });
 }
 
 
-function update_ports_manual(devices)
-{
-
-
-}
 
 function writeFileEntry(writableEntry, opt_blob, callback) {
   writableEntry.createWriter(function(writer) {
