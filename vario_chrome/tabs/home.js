@@ -43,6 +43,8 @@ function update_progressbar(val)
     });
 }
 
+var error_message = "unknown";
+
 function update_port_state(state)
 {
     $("#port_wizard_text").html("");
@@ -90,7 +92,7 @@ function update_port_state(state)
         break;
         case(pstates.error):
             $("#port_wizard_text").html("Error");
-            $("#port_wizard_desc").html("There was an error during transfer please try again");
+            $("#port_wizard_desc").html("There was an error during comunication with SkyBean. Please try again <br><br>Error details:<br>" + error_message);
         break;       
         case(pstates.upload_cfg):
             $("#port_wizard_text").html("Uploading configuration");
@@ -154,6 +156,7 @@ function PortHandler()
     this.port_info = null;
     this.task = false;
     this.prog_size = 128;
+    this.old_port = false;
 
     chrome.serial.onReceive.addListener(function (info)
     {
@@ -166,6 +169,25 @@ function PortHandler()
         }
     });
     
+    chrome.serial.onReceiveError.addListener(function watch_for_on_receive_errors(info) {
+        console.log(info);
+
+        switch (info.error)
+        {
+            case("device_lost"):
+                error_message = "Device was disconnected.";
+                port_handler.cancel();
+                update_port_state(pstates.error);
+            break;
+            case("system_error"):
+                console.log("traing to recover");
+                if (port_handler.old_port)
+                    port_handler.openPort(port_handler.old_port);
+
+            break;
+        }
+    });
+
 
     this.getStates = function()
     {
@@ -206,6 +228,7 @@ function PortHandler()
     {
         console.log("Opening " + port);
 
+        this.old_port = port;
 
         chrome.serial.connect(port, {bitrate: 115200}, function(info) {
             console.log("port opened");
@@ -218,9 +241,7 @@ function PortHandler()
             else
                 port_handler.init_parser();
 
-            self.onReceiveError.addListener(function watch_for_on_receive_errors(info) {
-                console.error(info);
-            });
+
 
         });
 
@@ -704,6 +725,7 @@ function PortHandler()
             chrome.serial.disconnect(this.port_info.connectionId, function(){
                 console.log("Port closed");
                 this.port_info = null;
+                this.old_port = false;
             });
         }
     };
@@ -925,7 +947,7 @@ function tab_home_init()
     });
     
     $("#port_open").click(function(){
-        port_name = $("#port_selector").val();
+        var port_name = $("#port_selector").val();
         if (port_name != null)
             port_handler.openPort(port_name);
     });
