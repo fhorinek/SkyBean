@@ -152,12 +152,13 @@ function PortHandler()
 {
     this.state = pstates.idle;
     this.port_info = null;
-    this.old_ports = false;
     this.task = false;
     this.prog_size = 128;
 
-    chrome.serial.onReceive.addListener(function (info){
+    chrome.serial.onReceive.addListener(function (info)
+    {
         data = new Uint8Array(info.data);
+        console.log("data_in");
         
         for (i = 0; i < data.length; i++)
         {
@@ -186,6 +187,7 @@ function PortHandler()
 
         console.log("Starting wizard");
         this.setState(pstates.auto_com);
+        this.old_ports = false;
         
         chrome.serial.getDevices(this.updatePortsWizard);
     };
@@ -193,8 +195,6 @@ function PortHandler()
 
     this.startManual = function()
     {
-        // this.task = task;
-
         console.log("Starting manual");
         this.setState(pstates.manual_com);
         
@@ -276,6 +276,7 @@ function PortHandler()
             name = new_ports[id].displayName;
             if (name == "FT231X_USB_UART")
                 name = "SkyBean USB interface";
+
             $("#port_selector").append("<option value=\"" + new_ports[id].path + "\">" + new_ports[id].path + " (" + name + ")</option>");
         }
         
@@ -705,7 +706,7 @@ function PortHandler()
     this.cancel = function()
     {
         this.state = pstates.idle;
-
+        this.parser_cmd = pcmd.wait_for_hello;
     };
 }
 
