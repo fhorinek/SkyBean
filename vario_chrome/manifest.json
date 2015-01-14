@@ -18,7 +18,6 @@
     "serial",
     "webview",
     {"fileSystem": ["write", "retainEntries", "directory"]}, 
-    "downloads",
     "storage",
     "http://glados.horinek.sk/*"
   ]

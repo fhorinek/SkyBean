@@ -188,7 +188,7 @@ function PortHandler()
         console.log("Starting wizard");
         this.setState(pstates.auto_com);
         this.old_ports = false;
-        
+
         chrome.serial.getDevices(this.updatePortsWizard);
     };
 
@@ -217,6 +217,11 @@ function PortHandler()
                 port_handler.startProg();
             else
                 port_handler.init_parser();
+
+            self.onReceiveError.addListener(function watch_for_on_receive_errors(info) {
+                console.error(info);
+            });
+
         });
 
     };
@@ -698,7 +703,7 @@ function PortHandler()
         {
             chrome.serial.disconnect(this.port_info.connectionId, function(){
                 console.log("Port closed");
-                this.port_info == null;
+                this.port_info = null;
             });
         }
     };
