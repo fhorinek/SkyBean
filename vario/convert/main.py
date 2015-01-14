@@ -5,6 +5,7 @@ import serial
 from intelhex import IntelHex
 import time
 import datetime
+import base64
 
 
 def add8(a, b):
@@ -32,16 +33,23 @@ class Hex2BinConv():
         adr = self.hex.minaddr()
         max_adr = self.hex.maxaddr()
 
-        out_file = open(self.out, "wb");
+        tmp_file = open("tmp.bin", "wb")
+        out_file = open(self.out, "w")
 
         print "Converting HEX 2 BIN ...", 
 
         while(adr <= max_adr):
-            out_file.write(chr(self.hex[adr]))
-
+            tmp_file.write(chr(self.hex[adr]))
             adr += 1
+
+        tmp_file.close()
+        
+        tmp_file = open("tmp.bin", "r")
+        
+        base64.encode(tmp_file, out_file)
         
         out_file.close()
+
         print "Done"
         
             
@@ -75,7 +83,7 @@ if (f):
 else:
     number = ""
 
-out = sys.argv[2] + "skybean_" + number + label + ".bin"
+out = sys.argv[2] + "skybean_" + number + label + ".ebin"
     
 
 a = Hex2BinConv(out)

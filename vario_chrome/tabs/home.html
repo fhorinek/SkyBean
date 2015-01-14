@@ -1,14 +1,17 @@
 <webview class="fb_window" id="fb_window" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fvarioskybean&width&height=600&colorscheme=light&show_faces=false&header=true&stream=true&show_border=false&appId=856385571060120"></webview>
 
 <h1>Home</h1>
-Welcome to SkyBean configurator ...
+Welcome to SkyBean configurator!
+
+
 
 <div class="alert">
-    Beware this is early software release, proceed with caution! You need to update to beta firmware on SkyBean to use this configurator, but you can allways downgrade to previous stable release.
+    You need to update SkyBean firmware to <u>skybean_beta_cfg.ebin</u> to use this configurator.
+    You can allways downgrade to stable release. 
 </div>
 
 <div class="alert">
-    Report any problems or your suggestions to <a target="_blank" href="mailto:bugs@skybean.eu">bugs@skybean.eu</a>
+    You have to save configuration to SkyBean when you upgrade to beta firmware for the first time.
 </div>
 
 <br>
@@ -20,8 +23,9 @@ Welcome to SkyBean configurator ...
 <br>
 <input type="button" value="Reset configuration to default" id="home_button_reset" /><br />
 <br>
-<input type="button" value="Update firmware" id="home_button_program" /><br />
+<input type="button" value="Update SkyBean firmware" id="home_button_program" /><br />
 
+<div id="home_popup_lock"></div>
 <div id="home_popup">
 
     <div>
@@ -40,18 +44,8 @@ Welcome to SkyBean configurator ...
 
     <br>
 
-    <div id="progressbar"><div class="progress-label">Loading...</div></div>
+    <div id="progressbar"></div>
 
-    <div id="port_wizard">
-
-
-        <br>
-        <div class="menu_links_bottom">
-            <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
-            <a id="home_load_from_skybean_wizard_cancel" class="menu_links"  href="#">Close</a>
-        </div>
-    </div> 
-    
     <div id="port_manual">
         <select name="port_selector" id="port_selector">
             <option disabled>No COM ports found</option>
@@ -63,10 +57,6 @@ Welcome to SkyBean configurator ...
         </div>
      
         <br>
-        <div class="menu_links_bottom">        
-            <a id="yes_wizard" class="menu_links" href="#">I don't know what to do.</a>
-            <a id="home_load_from_skybean_manual_cancel" class="menu_links"  href="#">Close</a>        
-        </div>
     </div>
    
 
@@ -81,11 +71,22 @@ Welcome to SkyBean configurator ...
         </div>
      
         <br>
-        <div class="menu_links_bottom">        
-            <a id="home_firmware_cancel" class="menu_links"  href="#">Close</a>        
-        </div>
+    </div>
+
+    <div class="menu_links_bottom">        
+        <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
+        <a id="yes_wizard" class="menu_links" href="#">I don't know what to do</a>
+        <a id="firmware_load" class="menu_links"  href="#">Load firmware from file</a>     
+        <a id="popup_close" class="menu_links"  href="#">Close</a>        
+        <a id="popup_cancel" class="menu_links"  href="#">Cancel</a>        
     </div>
 
 </div>
 
+<div class="alert">
+    Please remeber this is early release.
+</div>
 
+<div class="alert">
+    Report any problems or your suggestions to <a target="_blank" href="mailto:bugs@skybean.eu">bugs@skybean.eu</a>
+</div>

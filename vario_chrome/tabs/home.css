@@ -30,6 +30,7 @@ webview.fb_window
 {
     font-size: 10pt;
     font-weight: bold;
+    margin-top: 0;
 }
 
 div#home_popup
@@ -45,7 +46,7 @@ div#home_popup
     margin-left: -250px;
     width: 500px;
     margin-top: -125px;
-    height: 250px;
+    height: 150px;
     
     padding: 20px;
     
@@ -55,19 +56,17 @@ div#home_popup
     display: none;
 }
 
-.ui-progressbar {
-    position: relative;
-}
-.progress-label {
-    position: absolute;
-    left: 50%;
-    top: 4px;
-    font-weight: bold;
-    text-shadow: 1px 1px 0 #fff;
-}
-
-#progressbar
+div#home_popup_lock
 {
+    position: fixed;
+    float: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    z-index: 99;
+    
     display: none;
 }
 
@@ -79,6 +78,10 @@ input[type=button]
     text-align: center;
 
 }
+
+  #progressbar .ui-progressbar-value {
+    background-color: red !important;
+  }
 
 div.alert
 {
