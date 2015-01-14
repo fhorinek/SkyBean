@@ -32,6 +32,8 @@ void configurator_loop()
 {
 	uint16_t timeout = 1000;
 
+	_delay_ms(1000);
+
 	printf("skybean");
 
 	//send build version
