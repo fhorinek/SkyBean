@@ -180,9 +180,19 @@ function PortHandler()
                 update_port_state(pstates.error);
             break;
             case("system_error"):
-                console.log("traing to recover");
+                console.log("trying to recover..");
                 if (port_handler.old_port)
-                    port_handler.openPort(port_handler.old_port);
+                {
+                    chrome.serial.disconnect(port_handler.port_info.connectionId, function(){
+                        console.log("closing fast");
+                        chrome.serial.connect(port_handler.old_port, {bitrate: 115200}, function(info){
+                            console.log("port reopened");
+                            console.log(info);
+                            port_handler.port_info = info;
+
+                        });
+                    });
+                }
 
             break;
         }
@@ -724,8 +734,8 @@ function PortHandler()
         {
             chrome.serial.disconnect(this.port_info.connectionId, function(){
                 console.log("Port closed");
-                this.port_info = null;
-                this.old_port = false;
+                port_handler.port_info = null;
+                port_handler.old_port = false;
             });
         }
     };
