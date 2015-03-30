@@ -55,7 +55,8 @@ struct configuration
 
 	uint8_t int_interval;		//1		38		12 - 50
 
-	uint8_t reserved[10];		//10	39
+	bool fluid_update;			//1		39
+	uint8_t reserved[9];		//9		40
 };								//49
 
 typedef struct configuration configuration;

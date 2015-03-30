@@ -1,6 +1,5 @@
 <h1>Settings</h1>
 
-Here you can set the vario configuration
 
 <div class="line">
     <div class="set_label">
@@ -24,8 +23,7 @@ Here you can set the vario configuration
     <div class="set_value">
         <input id="set_auto_value" />
         <input type="checkbox" name="set_auto_enable" id="set_auto_enable" value="1">
-        <label for="set_auto_enable">Enabled</label>
-        
+        <label for="set_auto_enable">Enable</label>
     </div>
     <div class="set_note">
         How long shoud vario stay on when there is no change in altitude? Set to zero to disable. You can't change this via button menu.
@@ -80,9 +78,36 @@ Here you can set the vario configuration
     </div>    
 </div>
 
-<!--
-<h2>Experimental</h2>
+<h2>Experimental (beta2 only)</h2>
 
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-volume-off"></i> Silent start
+    </div>
+    <div class="set_value">
+
+        <input type="checkbox" name="set_supress_startup" id="set_supress_startup" value="0">
+        <label for="set_supress_startup">Enable</label>
+    </div>
+    <div class="set_note">
+        This option will suppress sound output until the filter is stabilised.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-signal"></i> Fluid beep
+    </div>
+    <div class="set_value">
+        <input type="checkbox" name="set_fluid_enable" id="set_fluid_enable" value="0">
+        <label for="set_fluid_enable">Enable</label>
+    </div>
+    <div class="set_note">
+        Continous lift beep frequency update.
+    </div>    
+</div>
+
+<!--
 <div class="line">
     <div class="set_label">
         <i class="fa fa-terminal"></i> Serial output</b>

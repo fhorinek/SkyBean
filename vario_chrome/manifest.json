@@ -2,7 +2,8 @@
   "manifest_version": 2,
   "name": "SkyBean configurator",
   "description": "SkyBean configuration application",
-  "version": "0.1",
+  "short_name": "SkyBean",
+  "version": "0.1.0.3",
   "minimum_chrome_version": "33",
   "icons": {
     "16": "icon_16.png",
@@ -17,7 +18,11 @@
   [
     "serial",
     "webview",
-    {"fileSystem": ["write", "retainEntries", "directory"]}, 
+    {"fileSystem": 
+      ["write", 
+       "retainEntries", 
+       "directory"]
+    }, 
     "storage",
     "http://glados.horinek.sk/*"
   ]

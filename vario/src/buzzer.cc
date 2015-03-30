@@ -2,6 +2,7 @@
 
 extern float climb;
 extern Usart usart;
+extern configuration cfg;
 
 Timer timer_buzzer_tone;
 Timer timer_buzzer_delay;
@@ -63,6 +64,11 @@ void tone_set(uint16_t tone)
 		timer_buzzer_tone.SetValue(0);
 }
 
+#define PERIOD_SOUND		0
+#define PERIOD_PAUSE		1
+
+volatile uint8_t buzzer_period = PERIOD_SOUND;
+
 void buzzer_set_tone(uint16_t tone)
 {
 	if (tone == 0)
@@ -86,14 +92,15 @@ void buzzer_set_tone(uint16_t tone)
 		if (delay_on == false)
 			tone_set(next_tone);
 
+		//fluid update is enabled
+		if (cfg.fluid_update and buzzer_period == PERIOD_SOUND)
+			tone_set(next_tone);
+
 		timer_buzzer_tone.Start(); //if it is not running
 	}
 }
 
-#define PERIOD_SOUND		0
-#define PERIOD_PAUSE		1
 
-volatile uint8_t buzzer_period = PERIOD_SOUND;
 
 ISR(timerC5_overflow_interrupt)
 {
@@ -304,29 +311,6 @@ void buzzer_step()
 	buzzer_set_tone(freq);
 	buzzer_set_delay(length, pause);
 
-
-	//experiment with continuous frequency change when lift
-	//I do not think it will work in this state...
-#ifdef FLUID_LIFT
-	fluid_lift_counter = (fluid_lift_counter + 1) % FLUID_LIFT_REFRESH;
-
-	if (fluid_lift_counter == 0)
-	{
-
-		if (old_freq != freq)
-		{
-			old_freq = freq;
-			tone_set(freq);
-
-			TCC5.CTRLGSET |= 0b00001000; //restart timer
-		}
-		fluid_lift_counter += 1;
-	}
-	else
-	{
-		fluid_lift_counter = (fluid_lift_counter + 1) % FLUID_LIFT_REFRESH;
-	}
-#endif
 }
 
 

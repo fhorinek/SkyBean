@@ -61,7 +61,9 @@ function default_cfg()
 
     cfg.int_interval = 25;
     
-    cfg.reserved = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    cfg.fluid_update = 0;
+    
+    cfg.reserved = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     return cfg;
 }
@@ -233,6 +235,8 @@ function decode_cfg(data)
     cfg.kalman_p = get_float(data, 34);
 
     cfg.int_interval = get_uint8(data, 38);
+
+    cfg.fluid_update = get_uint8(data, 39);
     
     return cfg;
 }
@@ -277,8 +281,10 @@ function encode_cfg(data)
     data += set_float(cfg.kalman_p);
 
     data += set_uint8(cfg.int_interval);
+
+    data += set_uint8(cfg.fluid_update);
     
-    data += "*RESERVED*" //reserved
+    data += "*RESERVE*" //reserved
 
     return data;
 }

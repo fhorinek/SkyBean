@@ -202,12 +202,23 @@ void sound_task()
 
 	case (SOUND_ON):
 		//power on sequence
-		buzzer_override_tone = 0;
-		buzzer_override_tone = if_in_range(10, 20, 900);
-		buzzer_override_tone = if_in_range(30, 40, 600);
-		buzzer_override_tone = if_in_range(50, 60, 300);
 
-		if (buzzer_override_tone)
+		buzzer_override_tone = 0;
+
+		if (cfg.supress_startup)
+		{
+			buzzer_override_tone = if_in_range(450, 460, 900);
+			buzzer_override_tone = if_in_range(470, 480, 600);
+			buzzer_override_tone = if_in_range(490, 500, 300);
+		}
+		else
+		{
+			buzzer_override_tone = if_in_range(10, 20, 900);
+			buzzer_override_tone = if_in_range(30, 40, 600);
+			buzzer_override_tone = if_in_range(50, 60, 300);
+		}
+
+		if ((sound_duration / 10) % 2 == 1)
 			LEDG_ON
 		else
 			LEDG_OFF
@@ -285,6 +296,8 @@ void start_sound(uint8_t sound)
 
 	case (SOUND_ON):
 		sound_duration = 60;
+		if (cfg.supress_startup)
+			sound_duration = 500;
 		break;
 
 	case (SOUND_LIFT):

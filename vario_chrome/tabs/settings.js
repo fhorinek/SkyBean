@@ -13,6 +13,12 @@ function tab_settings_init()
         numberFormat: "f"
     });
 
+    $('#set_fluid_value').spinner({
+      step: 1,
+      max: 255,
+      min: 0
+    });
+
     $('#set_volume1').click(function (){set_volume(1);});
     $('#set_volume2').click(function (){set_volume(2);});
     $('#set_volume3').click(function (){set_volume(3);});
@@ -35,8 +41,32 @@ function tab_settings_init()
     $("#set_sink_4").on("spinchange", function (){set_treshold(false, 3, this)});
     $("#set_sink_5").on("spinchange", function (){set_treshold(false, 4, this)});
 
-    $("#set_serial").on("change", function (){set_serial_output(this)});
+    $('#set_fluid_enable').change(function (){set_fluid();});
+
+    $('#set_supress_startup').change(function (){set_supress_startup();});
+//    $("#set_serial").on("change", function (){set_serial_output(this)});
 }
+
+function set_supress_startup()
+{
+    if ($('#set_supress_startup').is(":checked"))
+        actual_cfg.supress_startup = 1;
+    else
+        actual_cfg.supress_startup = 0;
+}
+
+function set_fluid()
+{
+    if ($('#set_fluid_enable').is(":checked"))
+    {
+         actual_cfg.fluid_update = 1;
+    }
+    else
+    {
+         actual_cfg.fluid_update = 0;
+    }
+}
+
 
 function set_actual_profile(obj)
 {
@@ -102,6 +132,9 @@ function tab_settings_show()
     
     $('#set_auto_enable').prop("checked", actual_cfg.auto_poweroff != 0);
     set_auto_poweroff();
+    
+    set_fluid();
+    set_supress_startup();
     
     $("#set_lift_1").val(actual_cfg.lift_steps[0] / 100);
     $("#set_lift_2").val(actual_cfg.lift_steps[1] / 100);

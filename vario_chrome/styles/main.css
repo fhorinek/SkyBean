@@ -5,7 +5,14 @@ html, body {
 
 h1, h2, h3, b
 {
+    float: left;
     color: #428bca;
+    width: 100%;
+}
+
+h2
+{
+    padding-top: 20px;
 }
 
 div.tab
