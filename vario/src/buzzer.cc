@@ -192,15 +192,16 @@ void buzzer_init()
 	GpioSetInvert(portc6, ON);
 	GpioSetInvert(portc7, ON);
 
-#ifdef FAST_CLOCK
-	timer_buzzer_tone.Init(timerC4, timer_div1024);
-	timer_buzzer_delay.Init(timerC5, timer_div1024);
-#endif
-
-#ifdef SLOW_CLOCK
-	timer_buzzer_tone.Init(timerC4, timer_div64);
-	timer_buzzer_delay.Init(timerC5, timer_div64);
-#endif
+	if (fast_clock)
+	{
+		timer_buzzer_tone.Init(timerC4, timer_div1024);
+		timer_buzzer_delay.Init(timerC5, timer_div1024);
+	}
+	else
+	{
+		timer_buzzer_tone.Init(timerC4, timer_div64);
+		timer_buzzer_delay.Init(timerC5, timer_div64);
+	}
 
 	timer_buzzer_tone.SetMode(timer_pwm);
 	TCC4.CTRLC = 0b00001100;

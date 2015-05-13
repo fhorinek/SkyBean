@@ -15,12 +15,6 @@
 	#define SENSOR	BMP180 sensor
 #endif
 
-//#define FLUID_LIFT
-#define FLUID_LIFT_REFRESH	20
-//1 == 20ms
-
-//#define FAST_CLOCK
-#define SLOW_CLOCK
 
 //uart debug & timing pin
 //#define ENABLE_DEBUG_TIMING
@@ -48,5 +42,6 @@
 //#define AUTO_TIMEOUT	(60000 * 5) //5min
 #define AUTO_THOLD		1 //+-1m == max diff 2m
 
+extern bool fast_clock;
 
 #endif /* CFG_H_ */

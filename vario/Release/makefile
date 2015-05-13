@@ -94,7 +94,7 @@ vario.eep: vario.elf
 
 sizedummy: vario.elf
 	@echo 'Invoking: Print Size'
-	-avr-size --format=berkeley -t vario.elf
+	-avr-size --format=avr --mcu=atxmega32e5 vario.elf
 	@echo 'Finished building: $@'
 	@echo ' '
 

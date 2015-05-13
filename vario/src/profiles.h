@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #define CFG_SERIAL_OUTPUT_NONE	0
-#define CFG_SERIAL_OUTPUT_DIGI	1
+#define CFG_SERIAL_OUTPUT_KOBO	1
 #define CFG_SERIAL_OUTPUT_DEBUG	2
 
 struct profile

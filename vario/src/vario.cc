@@ -18,6 +18,8 @@ extern float raw_pressure;
 extern Timer timer_buzzer_tone;
 extern Timer timer_buzzer_delay;
 
+bool fast_clock;
+
 void mark()
 {
 	GpioSetDirection(LEDR, OUTPUT);
@@ -86,15 +88,19 @@ void total_low_power()
 
 void Setup()
 {
-	//For debug only
-#ifdef FAST_CLOCK
-	ClockSetSource(x32MHz);
-#endif
-
 	GpioSetDirection(LEDR, OUTPUT);
 	GpioSetDirection(LEDG, OUTPUT);
 
 	LoadEEPROM();
+
+	if (cfg.serial_output > 0)
+		fast_clock = true;
+	else
+		fast_clock = false;
+
+	if (fast_clock)
+		ClockSetSource(x32MHz);
+
 
 	init_low_power();
 
@@ -134,7 +140,8 @@ void Setup()
 
 	battery_init();
 
-	bui_init();
+	if (cfg.serial_output != CFG_SERIAL_OUTPUT_KOBO)
+		bui_init();
 
 	buzzer_init();
 
@@ -146,13 +153,11 @@ void Setup()
 	sensor.CheckID();
 #endif
 
-#ifdef SLOW_CLOCK
-	meas_timer.Init(timerD5, timer_div4); //at 2MHz
-#endif
+	if (fast_clock)
+		meas_timer.Init(timerD5, timer_div64); //at 32MHz
+	else
+		meas_timer.Init(timerD5, timer_div4); //at 2MHz
 
-#ifdef FAST_CLOCK
-	meas_timer.Init(timerD5, timer_div64); //at 32MHz
-#endif
 
 	meas_timer.SetTop(20 * 500); //50Hz
 	meas_timer.SetCompare(timer_A, 500 * 5); //5ms - temp end
@@ -202,12 +207,10 @@ ISR(timerD5_compareA_interrupt)
 
 	buzzer_step();
 
-
-#ifdef ENABLE_DEBUG_UART
 	pc_step();
-#endif
 
-	bui_step();
+	if (cfg.serial_output != CFG_SERIAL_OUTPUT_KOBO)
+		bui_step();
 
 	battery_step();
 

@@ -21,9 +21,13 @@ extern float climb;
 extern bool meas_new_sample;
 
 Usart usart;
+Usart gps_usart;
 
 CreateStdIn(usart_in, usart.Read);
 CreateStdOut(usart_out, usart.Write);
+
+char gps_buff[256];
+uint8_t gps_buff_index = 0;
 
 void pc_init()
 {
@@ -73,11 +77,49 @@ void pc_init()
 		usart.Init(usartD0, 115200, 8, 32);
 		usart.SetInterruptPriority(MEDIUM);
 	}
+
+	if (cfg.serial_output == CFG_SERIAL_OUTPUT_DEBUG)
+	{
+		gps_usart.Init(usartC0, 9, 250, 0);
+		gps_usart.SetInterruptPriority(MEDIUM);
+	}
 }
 
-//this is for production test only
+int checksum(char *s)
+{
+    int c = 0;
+
+    while(*s)
+        c ^= *s++;
+
+    return c;
+}
+
 void pc_step()
 {
 	if (cfg.serial_output == CFG_SERIAL_OUTPUT_DEBUG)
+	{
+		//this is for production test only
 		printf("%0.2f;%0.2f;%0.3f;%0.3f;\n", raw_pressure, pressure, altitude0, climb);
+	}
+
+	if (cfg.serial_output == CFG_SERIAL_OUTPUT_KOBO)
+	{
+		while (!gps_usart.isRxBufferEmpty())
+		{
+			uint8_t c = gps_usart.Read();
+			gps_buff[gps_buff_index++] = c;
+			if (c == '\n')
+			{
+				gps_buff[gps_buff_index] = 0;
+				printf("%s", gps_buff);
+				gps_buff_index = 0;
+			}
+
+		}
+		char buff[512];
+
+		sprintf(buff, "$D,%0.2f,%0.3f,,,%0.1f,,,,,,,", climb * 10, pressure, temperature);
+		printf("%s*%02X\n", buff, checksum(buff));
+	}
 }
