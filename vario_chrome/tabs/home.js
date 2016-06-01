@@ -180,7 +180,8 @@ function PortHandler()
                 update_port_state(pstates.error);
             break;
             case("system_error"):
-                console.log("trying to recover..");
+            case("break"):
+                console.log("trying to recover from " + info.error + "..");
                 if (port_handler.old_port)
                 {
                     chrome.serial.disconnect(port_handler.port_info.connectionId, function(){
@@ -189,8 +190,7 @@ function PortHandler()
                             console.log("port reopened");
                             console.log(info);
                             port_handler.port_info = info;
-
-                        });
+                       });
                     });
                 }
 
@@ -639,7 +639,7 @@ function PortHandler()
                         console.log("Verification done");
                         this.setState(pstates.fw_done);      
                         this.send("b", function(){
-                            this.closePort();    
+                            port_handler.closePort();    
                         });
                     }
                     else

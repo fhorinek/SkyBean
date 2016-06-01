@@ -2,5 +2,9 @@
 
 #ifndef BUILD_NUMBER_H
 #define BUILD_NUMBER_H
-#define BUILD_NUMBER 777
+<<<<<<< Updated upstream
+#define BUILD_NUMBER 552
+=======
+#define BUILD_NUMBER 786
+>>>>>>> Stashed changes
 #endif
