@@ -2,6 +2,7 @@
 
 extern float climb;
 extern Usart usart;
+extern configuration cfg;
 
 Timer timer_buzzer_tone;
 Timer timer_buzzer_delay;
@@ -13,12 +14,10 @@ volatile uint16_t next_pause = 0;
 volatile bool delay_on = false;
 uint8_t buzzer_mode = 0;
 
-extern uint8_t ram_buzzer_volume;
-
 //set buzzer volume
 void buzzer_set_volume()
 {
-	switch(ram_buzzer_volume)
+	switch(cfg.buzzer_volume)
 	{
 	case(0): //off
 		//DisableOutputs(timer_A | timer_B | timer_C | timer_D)
@@ -65,6 +64,11 @@ void tone_set(uint16_t tone)
 		timer_buzzer_tone.SetValue(0);
 }
 
+#define PERIOD_SOUND		0
+#define PERIOD_PAUSE		1
+
+volatile uint8_t buzzer_period = PERIOD_SOUND;
+
 void buzzer_set_tone(uint16_t tone)
 {
 	if (tone == 0)
@@ -88,14 +92,15 @@ void buzzer_set_tone(uint16_t tone)
 		if (delay_on == false)
 			tone_set(next_tone);
 
+		//fluid update is enabled
+		if (cfg.fluid_update and buzzer_period == PERIOD_SOUND)
+			tone_set(next_tone);
+
 		timer_buzzer_tone.Start(); //if it is not running
 	}
 }
 
-#define PERIOD_SOUND		0
-#define PERIOD_PAUSE		1
 
-volatile uint8_t buzzer_period = PERIOD_SOUND;
 
 ISR(timerC5_overflow_interrupt)
 {
@@ -216,24 +221,19 @@ bool climb_override = false;
 uint16_t buzzer_tone;
 uint16_t buzzer_delay;
 
-//Sound profile
-// - 25 points total
-// - this is default configuration, audio profiler is looking for these values. They are replaced then in hex file
-// - you can use http://audio.skybean.eu/ to create this using Make Code button
-static uint16_t vario_freq[] = {127, 130, 133, 136, 146, 159, 175, 198, 234, 283, 344, 415, 564, 701, 788, 846, 894, 927, 955, 985, 1008, 1037, 1070, 1106, 1141, };
-static uint16_t vario_leng[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 540, 438, 368, 312, 259, 219, 176, 138, 110, 81, 60, 46, 36, };
-static uint16_t vario_paus[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 320, 242, 189, 155, 134, 115, 95, 75, 55, 37, 30, 28, 28, };
 
 //linear aproximation between two points
 uint16_t get_near(float vario, uint16_t * src)
 {
-	float findex = floor(vario) +  12;
+	vario = vario * 2; //1 point for 50cm
+	float findex = floor(vario) +  20;
 	float m = vario - floor(vario);
 
 	uint8_t index = findex;
-	if (findex > 23)
+
+	if (findex > 39)
 	{
-		index = 23;
+		index = 39;
 		m = 1.0;
 	}
 
@@ -252,15 +252,12 @@ uint16_t get_near(float vario, uint16_t * src)
 	return start;
 }
 
-
 uint16_t old_freq = 0;
 uint16_t old_leng = 0;
 uint16_t old_paus = 0;
 
-extern uint8_t ram_sink_begin;
-extern uint8_t ram_sink_end;
-extern uint8_t ram_lift_begin;
-extern uint8_t ram_lift_end;
+extern float ram_sink_begin;
+extern float ram_lift_begin;
 
 uint8_t fluid_lift_counter = 0;
 
@@ -294,25 +291,13 @@ void buzzer_step()
 //		{LEDR_OFF;}
 
 	//GET fresh values from table
-	// - ram_lift_begin & ram_sink_begin are in 10cm/s (e.g. 10 == 1m/s)
 	// - climb is float in m/s
-	if (climb >= ram_lift_begin / 10.0 || (climb <= -(ram_sink_begin / 10.0) && ram_sink_begin != 255))
+	if (climb >= ram_lift_begin || climb <= (ram_sink_begin))
 	{
 		//get frequency from the table
-		freq = get_near(climb, vario_freq);
-
-		if (climb > 0)
-		{
-			//if climb locate if from the table
-			length = get_near(climb, vario_leng);
-			pause = get_near(climb, vario_paus);
-		}
-		else
-		{
-			//if not
-			length = 0;
-			pause = 0;
-		}
+		freq = get_near(climb, prof.buzzer_freq);
+		length = get_near(climb, prof.buzzer_length);
+		pause = get_near(climb, prof.buzzer_pause);
 	}
 	else
 	//no threshold was exceeded -> silent
@@ -326,29 +311,6 @@ void buzzer_step()
 	buzzer_set_tone(freq);
 	buzzer_set_delay(length, pause);
 
-
-	//experiment with continuous frequency change when lift
-	//I do not think it will work in this state...
-#ifdef FLUID_LIFT
-	fluid_lift_counter = (fluid_lift_counter + 1) % FLUID_LIFT_REFRESH;
-
-	if (fluid_lift_counter == 0)
-	{
-
-		if (old_freq != freq)
-		{
-			old_freq = freq;
-			tone_set(freq);
-
-			TCC5.CTRLGSET |= 0b00001000; //restart timer
-		}
-		fluid_lift_counter += 1;
-	}
-	else
-	{
-		fluid_lift_counter = (fluid_lift_counter + 1) % FLUID_LIFT_REFRESH;
-	}
-#endif
 }
 
 

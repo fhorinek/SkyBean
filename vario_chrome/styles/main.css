@@ -1,0 +1,97 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+h1, h2, h3, b
+{
+    float: left;
+    color: #428bca;
+    width: 100%;
+}
+
+h2
+{
+    padding-top: 20px;
+}
+
+div.tab
+{
+    display: block;
+    float: left;
+    border-bottom: 1px solid white;
+    width: 100px;
+    height: 100px;
+    color: #428bca;
+    
+    font-weight: bold;
+    font-size: 14pt;
+    text-align: center;
+}
+
+div.tab_active
+{
+    background-repeat: no-repeat;
+    background-position: center;    
+    background: linear-gradient(to right, #F0F0F0, white);
+    color: black;
+}
+
+div.tab_inactive
+{
+    color: lightgray;
+}
+
+.valign
+{
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+.menu_links
+{
+    font-style: italic;
+}
+
+
+#menu
+{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    left: 0;
+    
+    background: linear-gradient(to right, #F0F0F0 , lightgray); 
+}
+
+#page
+{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 100px;
+    margin-left: 20px;
+    overflow-x: auto;
+}
+
+.ui-spinner-input
+{
+    padding: 4px 4px;
+    width: 65px;
+    text-align: right;
+}
+
+div.menu_links_bottom
+{
+    position: absolute;   
+    height: 15px;
+    bottom: 20px;
+    right: 20px;
+    width: 100%;
+    text-align: right;
+}

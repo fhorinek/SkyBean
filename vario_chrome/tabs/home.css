@@ -1,0 +1,93 @@
+webview.fb_window
+{
+    position: absolute; 
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 350px;
+    height: 600px;
+}
+
+#port_wizard
+{
+    display: none;
+}
+
+#port_manual
+{
+    display: none;
+}
+
+.loader
+{
+    /*display: none;*/
+    margin: 25px auto;
+    width: 200px;
+    height: 25px;
+}
+
+#port_wizard_text
+{
+    font-size: 10pt;
+    font-weight: bold;
+    margin-top: 0;
+}
+
+div#home_popup
+{
+    position: fixed;
+    float: none;
+    top: 50%;
+    left: 50%;
+    z-index: 100;
+    
+    background-color: white;
+    
+    margin-left: -250px;
+    width: 500px;
+    margin-top: -125px;
+    height: 150px;
+    
+    padding: 20px;
+    
+    box-shadow: 0 0 50px black;
+    border: 1px solid gray;
+    
+    display: none;
+}
+
+div#home_popup_lock
+{
+    position: fixed;
+    float: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    z-index: 99;
+    
+    display: none;
+}
+
+input[type=button]
+{         
+    width: 230px;
+    margin-top: 5px;
+    margin-left: 10px;
+    text-align: center;
+
+}
+
+  #progressbar .ui-progressbar-value {
+    background-color: red !important;
+  }
+
+div.alert
+{
+    font-size: 15pt;
+    margin: 15px;
+    color: #AA0000;
+    position: relative;
+    width: 400px;
+}

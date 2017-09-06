@@ -1,0 +1,87 @@
+<webview class="fb_window" id="fb_window" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fvarioskybean&width&height=600&colorscheme=light&show_faces=false&header=true&stream=true&show_border=false&appId=856385571060120"></webview>
+
+<h1>Home</h1>
+
+
+
+<div class="alert">
+    You need to update SkyBean firmware to <u>skybean_beta2.ebin</u> to use this configurator.
+    You can allways downgrade to stable release. 
+</div>
+
+<div class="alert">
+    You have to save configuration to SkyBean when you upgrade to beta firmware for the first time.
+</div>
+
+<br>
+<input type="button" value="Load configuration from SkyBean" id="home_button_load_from_skybean" /><br />
+<input type="button" value="Save configuration to SkyBean" id="home_button_save_to_skybean" /><br />
+<br>
+<input type="button" value="Load configuration from file" id="home_button_load_from_file" /><br />
+<input type="button" value="Save configuration to file" id="home_button_save_to_file" /><br />
+<br>
+<input type="button" value="Reset configuration to default" id="home_button_reset" /><br />
+<br>
+<input type="button" value="Update SkyBean firmware" id="home_button_program" /><br />
+
+<div id="home_popup_lock"></div>
+<div id="home_popup">
+
+    <div>
+        <h3 id="port_wizard_text"></h3>
+        <div id="port_wizard_desc"></div>
+    </div>
+
+    <div class="loader">
+        <div id="followingBallsG">
+            <div id="followingBallsG_1" class="followingBallsG"></div>
+            <div id="followingBallsG_2" class="followingBallsG"></div>
+            <div id="followingBallsG_3" class="followingBallsG"></div>
+            <div id="followingBallsG_4" class="followingBallsG"></div>
+        </div>
+    </div>
+
+    <br>
+
+    <div id="progressbar"></div>
+
+    <div id="port_manual">
+        <select name="port_selector" id="port_selector">
+            <option disabled>No COM ports found</option>
+        </select>
+
+        <div>
+            <input type="button" id="port_refresh" value="Refresh Ports" />
+            <input type="button" id="port_open" value="Open port" />        
+        </div>
+     
+        <br>
+    </div>
+   
+
+    <div id="firmware">
+        <select id="fw_select">
+            <option disabled>Unable to connect to update server</option>
+        </select>
+
+        <div>
+            <input type="button" id="fw_refresh" value="Refresh" />
+            <input type="button" id="fw_start" value="Upload to SkyBean" />        
+        </div>
+     
+        <br>
+    </div>
+
+    <div class="menu_links_bottom">        
+        <a id="no_wizard" class="menu_links"  href="#">I want to select the COM port manualy</a>
+        <a id="yes_wizard" class="menu_links" href="#">I don't know what to do</a>
+        <a id="firmware_load" class="menu_links"  href="#">Load firmware from file</a>     
+        <a id="popup_close" class="menu_links"  href="#">Close</a>        
+        <a id="popup_cancel" class="menu_links"  href="#">Cancel</a>        
+    </div>
+
+</div>
+
+<div class="line">
+    Please report any problems or your suggestions to <a target="_blank" href="mailto:bugs@skybean.eu">bugs@skybean.eu</a>
+</div>

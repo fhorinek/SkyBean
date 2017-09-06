@@ -165,8 +165,8 @@ void Usart::Init(USART_t * usart, PORT_t * port, uint8_t tx, uint8_t n, uint32_t
 		}
 	}
 
-	GpioSetDirection(port, tx, OUTPUT);
-	GpioWrite(port, tx, HIGH);
+//	GpioSetDirection(port, tx, OUTPUT);
+//	GpioWrite(port, tx, HIGH);
 
 	this->usart = usart;
 

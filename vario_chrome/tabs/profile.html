@@ -1,0 +1,42 @@
+<h1>Audio profile editor</h1>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-angle-double-right"></i> Profile name</b>
+    </div>
+    <div class="set_value">
+		<input id = "profile_name" >
+	    <!--input type="checkbox" name="profile_enable" id="profile_enable" value="1">
+	    <label for="profile_enable">Enabled</label-->	
+	</div>
+    <div class="set_note">
+        Here you can name <!--and enable or disable--> your profile. <!--You will need to have at least one profile selected.-->
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-cloud-upload"></i> Lift Treshold</b>
+    </div>
+    <div class="set_value">
+        <select id="profile_lift"></select>
+    </div>
+    <div class="set_note">
+        Here you can set lift treshold preset for this profile. This value can be changed via button menu for active profile.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-cloud-download"></i> Sink Treshold</b>
+    </div>
+    <div class="set_value">
+        <select id="profile_sink"></select>
+    </div>
+    <div class="set_note">
+        Here you can set sink treshold preset for this profile. This value can be changed via button menu for active profile.
+    </div>    
+</div>
+
+<div id="plot">
+</div>

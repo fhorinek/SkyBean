@@ -30,6 +30,8 @@ void bui_init()
 	LEDG_OFF
 }
 
+bool pressed_from_begining = true;
+
 void button_task()
 {
 	//pressed
@@ -37,12 +39,12 @@ void button_task()
 	{
 		if (button_state == BUTTON_IDLE)
 		{
-			button_pressed_start = get_sys_tick();
+			button_pressed_start = sys_tick_get();
 			button_delta = 0;
 			button_state = BUTTON_PRESSED;
 		}
 		else
-			button_delta = get_sys_tick() - button_pressed_start;
+			button_delta = sys_tick_get() - button_pressed_start;
 	}
 	else
 	//relased
@@ -50,6 +52,7 @@ void button_task()
 		if (button_state == BUTTON_PRESSED || button_state == BUTTON_WAITING)
 			button_state = BUTTON_IDLE;
 
+		pressed_from_begining = false;
 	}
 }
 
@@ -105,8 +108,9 @@ void bui_button_clear()
 #define BUI_MODE_LIFT		2
 #define BUI_MODE_SINK		3
 #define BUI_MODE_UNLOCK		4
+#define BUI_MODE_PROFILE	5
 
-#define BUI_SHORT_WAIT			300
+#define BUI_SHORT_WAIT		300
 #define BUI_WAIT			3000
 #define BUI_LONG_WAIT		6000
 
@@ -119,17 +123,16 @@ ISR(portc_interrupt)
 	//Dummy button IRQ just wake the device
 }
 
-extern uint8_t ram_buzzer_volume;
 uint8_t beep_count;
 
 void volume_toggle()
 {
-	ram_buzzer_volume++;
-	if (ram_buzzer_volume > 4)
-		ram_buzzer_volume = 1;
+	cfg.buzzer_volume++;
+	if (cfg.buzzer_volume > 4)
+		cfg.buzzer_volume = 1;
 
 	beep_blik = BEEP_BLIK_BOTH;
-	beep_count = ram_buzzer_volume;
+	beep_count = cfg.buzzer_volume;
 	start_sound(SOUND_BEEP);
 
 	StoreVolume();
@@ -199,12 +202,23 @@ void sound_task()
 
 	case (SOUND_ON):
 		//power on sequence
-		buzzer_override_tone = 0;
-		buzzer_override_tone = if_in_range(10, 20, 900);
-		buzzer_override_tone = if_in_range(30, 40, 600);
-		buzzer_override_tone = if_in_range(50, 60, 300);
 
-		if (buzzer_override_tone)
+		buzzer_override_tone = 0;
+
+		if (cfg.supress_startup)
+		{
+			buzzer_override_tone = if_in_range(450, 460, 900);
+			buzzer_override_tone = if_in_range(470, 480, 600);
+			buzzer_override_tone = if_in_range(490, 500, 300);
+		}
+		else
+		{
+			buzzer_override_tone = if_in_range(10, 20, 900);
+			buzzer_override_tone = if_in_range(30, 40, 600);
+			buzzer_override_tone = if_in_range(50, 60, 300);
+		}
+
+		if ((sound_duration / 10) % 2 == 1)
 			LEDG_ON
 		else
 			LEDG_OFF
@@ -282,6 +296,8 @@ void start_sound(uint8_t sound)
 
 	case (SOUND_ON):
 		sound_duration = 60;
+		if (cfg.supress_startup)
+			sound_duration = 500;
 		break;
 
 	case (SOUND_LIFT):
@@ -302,31 +318,16 @@ void start_sound(uint8_t sound)
 uint32_t next_step_wait = 0;
 uint8_t first_time = true;
 
-extern uint8_t ram_sink_begin;
-extern uint8_t ram_sink_end;
-extern uint8_t ram_lift_begin;
-extern uint8_t ram_lift_end;
-
-extern uint8_t ram_lift_cfg;
-extern uint8_t ram_sink_cfg;
-
 uint8_t play_cfg;
+
+extern float ram_sink_begin;
+extern float ram_lift_begin;
 
 //load threshold values for lift & sink
 void LiftSinkRefresh()
 {
-	ram_lift_begin = ram_lift_cfg;
-	ram_lift_end = ram_lift_begin + 150;
-
-	if (ram_sink_cfg > 1)
-	{
-		ram_sink_begin = (ram_sink_cfg - 1) * 5;
-		ram_sink_end = ram_sink_begin + 150;
-	}
-	else
-	{
-		ram_sink_begin = 255;
-	}
+	ram_lift_begin = cfg.lift_steps[prof.lift_treshold] / 100.0;
+	ram_sink_begin = cfg.sink_steps[prof.sink_treshold] / 100.0;
 }
 
 #define LED_MODE_IDLE	0
@@ -336,6 +337,7 @@ void LiftSinkRefresh()
 #define LED_MODE_G_ON	4
 #define LED_MODE_R_ON	5
 #define LED_MODE_BOTH	6
+#define LED_MODE_BLINK	7
 
 uint8_t blik = 0;
 uint8_t led_mode = LED_MODE_IDLE;
@@ -365,6 +367,20 @@ void led_task()
 		case(LED_MODE_R_ON):
 			LEDG_OFF
 			LEDR_ON
+		break;
+
+		//both blinking (for profile select)
+		case(LED_MODE_BLINK):
+			if (blik % 10 < 5)
+			{
+				LEDR_ON
+				LEDG_ON
+			}
+			else
+			{
+				LEDG_OFF
+				LEDR_OFF
+			}
 		break;
 
 		//alternate blinking (for menu)
@@ -416,24 +432,30 @@ volatile int16_t auto_start_value = 0;
 
 void auto_off_reset()
 {
-	auto_start_time = get_sys_tick();
+	auto_start_time = sys_tick_get();
 	auto_start_value = altitude0;
 }
 
 void auto_off_step()
 {
+	if (cfg.auto_poweroff == 0)
+		return;
+
 	if (abs(auto_start_value - altitude0) > AUTO_THOLD)
 	{
 		auto_off_reset();
 	}
 	else
-		if ((uint32_t)get_sys_tick() - (uint32_t)auto_start_time > (uint32_t)AUTO_TIMEOUT)
+	{
+		if ((uint32_t)sys_tick_get() - (uint32_t)auto_start_time > ((uint32_t)cfg.auto_poweroff * 1000))
 		{
 			start_sound(SOUND_OFF);
 		}
+	}
 }
 
 bool first_click = false;
+
 
 //BUI loop
 // - button user interface :-)
@@ -454,7 +476,7 @@ void bui_step()
 	if (sound_duration > 0)
 	{
 		//but reset wait timer
-		next_step_wait = get_sys_tick();
+		next_step_wait = sys_tick_get();
 		return;
 	}
 
@@ -483,11 +505,23 @@ void bui_step()
 
 	//idle
 	case(BUI_MODE_IDLE):
+
 		if (bui_is_extra_long())
 		{
-			//power off
-			start_sound(SOUND_OFF);
-			bui_button_clear();
+			if (pressed_from_begining)
+			{
+				//button is still pressed -> go to profile setup
+				next_step_wait = sys_tick_get();
+				bui_mode = BUI_MODE_PROFILE;
+				play_cfg = true;
+				bui_button_clear();
+			}
+			else
+			{
+				//power off
+				start_sound(SOUND_OFF);
+				bui_button_clear();
+			}
 		}
 
 
@@ -498,7 +532,7 @@ void bui_step()
 			{
 				//second click -> go to menu
 				led_mode = LED_MODE_ALT;
-				next_step_wait = get_sys_tick();
+				next_step_wait = sys_tick_get();
 				bui_mode = BUI_MODE_UNLOCK;
 				bui_button_clear();
 			}
@@ -506,13 +540,13 @@ void bui_step()
 			{
 				//first click
 				first_click = true;
-				next_step_wait = get_sys_tick();
+				next_step_wait = sys_tick_get();
 				bui_button_clear();
 			}
 		}
 
 		//too slow, reset click state
-		if (get_sys_tick() - next_step_wait > BUI_SHORT_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_SHORT_WAIT && button_state == BUTTON_IDLE)
 		{
 			first_click = false;
 		}
@@ -529,7 +563,7 @@ void bui_step()
 			bui_button_clear();
 			volume_toggle();
 			auto_off_reset();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//visual feedback for entering lift & sink menu
@@ -541,13 +575,13 @@ void bui_step()
 		//next step is to choose lift or sink menu
 		if (bui_was_long())
 		{
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 			bui_mode = BUI_MODE_SETTINGS;
 			bui_button_clear();
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -570,7 +604,7 @@ void bui_step()
 			bui_button_clear();
 			led_mode = LED_MODE_G_ON;
 			start_sound(SOUND_LIFT);
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//second click was long -> sink menu
@@ -581,11 +615,11 @@ void bui_step()
 			bui_button_clear();
 			led_mode = LED_MODE_R_ON;
 			start_sound(SOUND_SINK);
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -601,11 +635,11 @@ void bui_step()
 		if (bui_was_short())
 		{
 			bui_button_clear();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 
-			ram_lift_cfg++;
-			if (ram_lift_cfg > 5)
-				ram_lift_cfg = 1;
+			prof.lift_treshold++;
+			if (prof.lift_treshold > 5)
+				prof.lift_treshold = 1;
 
 			LiftSinkRefresh();
 
@@ -617,13 +651,13 @@ void bui_step()
 		if (play_cfg)
 		{
 			play_cfg = false;
-			beep_count = ram_lift_cfg;
+			beep_count = prof.lift_treshold;
 			beep_blik = BEEP_BLIK_GREEN;
 			start_sound(SOUND_BEEP);
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
@@ -639,11 +673,11 @@ void bui_step()
 		if (bui_was_short())
 		{
 			bui_button_clear();
-			next_step_wait = get_sys_tick();
+			next_step_wait = sys_tick_get();
 
-			ram_sink_cfg++;
-			if (ram_sink_cfg > 8)
-				ram_sink_cfg = 1;
+			prof.sink_treshold++;
+			if (prof.sink_treshold > 5)
+				prof.sink_treshold = 1;
 
 			LiftSinkRefresh();
 
@@ -655,17 +689,53 @@ void bui_step()
 		if (play_cfg)
 		{
 			play_cfg = false;
-			beep_count = ram_sink_cfg;
+			beep_count = prof.sink_treshold;
 			beep_blik = BEEP_BLIK_RED;
 			start_sound(SOUND_BEEP);
 		}
 
 		//no action for a while, reset to idle state
-		if (get_sys_tick() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
 		{
 			bui_mode = BUI_MODE_IDLE;
 			led_mode = LED_MODE_IDLE;
 			StoreSink();
+		}
+	break;
+
+	//sink menu
+	case(BUI_MODE_PROFILE):
+		led_mode = LED_MODE_BLINK;
+
+		//toggle configuration on short click
+		if (bui_was_short())
+		{
+			bui_button_clear();
+			next_step_wait = sys_tick_get();
+
+			cfg.selected_profile++;
+			if (cfg.selected_profile > 2)
+				cfg.selected_profile = 0;
+
+			play_cfg = true;
+		}
+
+		//the menu was just opened or changed
+		// playback the actual configuration
+		if (play_cfg)
+		{
+			play_cfg = false;
+			beep_count = cfg.selected_profile + 1;
+			beep_blik = BEEP_BLIK_BOTH;
+			start_sound(SOUND_BEEP);
+		}
+
+		//no action for a while, reset to idle state
+		if (sys_tick_get() - next_step_wait > BUI_LONG_WAIT && button_state == BUTTON_IDLE)
+		{
+			bui_mode = BUI_MODE_IDLE;
+			led_mode = LED_MODE_IDLE;
+			LoadProfile();
 		}
 	break;
 

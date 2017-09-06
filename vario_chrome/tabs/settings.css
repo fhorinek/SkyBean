@@ -1,0 +1,47 @@
+
+div.set_label
+{
+    font-size: 16pt;
+    
+    float: left;
+    width: 220px;
+    height: 35px;
+}
+
+div.set_value i
+{
+    font-size: 16pt;
+}
+
+div.set_value
+{
+    float: left;
+    /*width: 350px;
+    /*height: 35px;*/
+}
+
+div.set_note
+{
+    color: gray;
+    font-style: italic;
+    width: 100%;
+    float: left;
+}
+
+.set_value_inactive
+{
+    color: lightgray;
+}
+
+div.line
+{
+    margin-top: 20px;
+    float: left;
+    width: 100%;
+}
+
+#page_settings select
+{
+    width: 100px;
+}
+

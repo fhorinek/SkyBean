@@ -1,0 +1,125 @@
+<h1>Settings</h1>
+
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-volume-up"></i> Buzzer Volume</b>
+    </div>
+    <div class="set_value">
+        <i id="set_volume1" class="fa fa-square"></i>
+        <i id="set_volume2" class="fa fa-square"></i>
+        <i id="set_volume3" class="fa fa-square set_value_inactive"></i>
+        <i id="set_volume4" class="fa fa-square set_value_inactive"></i>
+    </div>
+    <div class="set_note">
+        How loud shoud vario beep? (1-2 square is good for helmet mounting, 3 when the wind is high, 4 when you mount the vario on harness or cockpit). You can change this via button menu.
+    </div>
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-power-off"></i> Auto power-off</b>
+    </div>
+    <div class="set_value">
+        <input id="set_auto_value" />
+        <input type="checkbox" name="set_auto_enable" id="set_auto_enable" value="1">
+        <label for="set_auto_enable">Enable</label>
+    </div>
+    <div class="set_note">
+        How long shoud vario stay on when there is no change in altitude? Set to zero to disable. You can't change this via button menu.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-bar-chart"></i> Selected profile</b>
+    </div>
+    <div class="set_value">
+        <select id="set_profile">
+
+        </select>
+    </div>
+    <div class="set_note">
+        What profile do you want to use? You can change this using button after power-on sequence.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-cloud-upload"></i> Lift Tresholds</b>
+    </div>
+    <div class="set_value">
+        <input class="set_steps" id="set_lift_1" /> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_lift_2" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_lift_3" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_lift_4" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_lift_5" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+
+    </div>
+    <div class="set_note">
+        Here you can change the lift treshold presets. You can't change values via button menu, however you can select diffrent preset.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-cloud-download"></i> Sink Tresholds</b>
+    </div>
+    <div class="set_value">
+        <input class="set_steps" id="set_sink_1" /> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_sink_2" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_sink_3" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_sink_4" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+        <input class="set_steps" id="set_sink_5" /> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i> <i class="fa fa-circle"></i><br>
+
+    </div>
+    <div class="set_note">
+         Here you can change the sink treshold presets. You can't change values via button menu, however you can select diffrent preset.       
+    </div>    
+</div>
+
+<h2>Experimental (beta2 only)</h2>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-volume-off"></i> Silent start
+    </div>
+    <div class="set_value">
+
+        <input type="checkbox" name="set_supress_startup" id="set_supress_startup" value="0">
+        <label for="set_supress_startup">Enable</label>
+    </div>
+    <div class="set_note">
+        This option will suppress sound output until the filter is stabilised.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-signal"></i> Fluid beep
+    </div>
+    <div class="set_value">
+        <input type="checkbox" name="set_fluid_enable" id="set_fluid_enable" value="0">
+        <label for="set_fluid_enable">Enable</label>
+    </div>
+    <div class="set_note">
+        Continous lift beep frequency update.
+    </div>    
+</div>
+
+<!--
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-terminal"></i> Serial output</b>
+    </div>
+    <div class="set_value">
+        <select id="set_serial">
+            <option value="0">none</option>
+            <option value="1">digifly</option>
+            <option value="2">debug</option>
+        </select>
+    </div>
+    <div class="set_note">
+        Serial output mode
+    </div>    
+</div>-->
