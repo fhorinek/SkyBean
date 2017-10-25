@@ -1,7 +1,12 @@
 function profile_get_near(findex, src)
 {
+    findex *= 2.0;
     index = Math.floor(findex) + 20;
+    
     m = findex - Math.floor(findex);
+    
+        console.log(index, m);
+
     if (index < 0)
     {
         index = 0;
@@ -23,6 +28,94 @@ function profile_get_near(findex, src)
 var profile_id = 0;
 
 
+function profile_demo(vario)
+{
+    var lift = cfg.lift_steps[actual_prof[profile_id].lift_treshold] / 100.0;
+    var sink = cfg.sink_steps[actual_prof[profile_id].sink_treshold] / 100.0;
+
+    console.log(vario);
+
+    if (vario > sink && vario < lift)
+    {
+        if (audio)
+            if (!audio.paused)
+                audio.pause();
+        return;
+    }
+
+    var freq = profile_get_near(vario, actual_prof[profile_id].buzzer_freq);
+    var leng = profile_get_near(vario, actual_prof[profile_id].buzzer_length);
+    var paus = profile_get_near(vario, actual_prof[profile_id].buzzer_pause);
+
+    play_beep(freq, leng, paus);
+}
+
+var audio = false;
+
+function play_beep(freq, leng, paus)
+{
+        
+    if (audio)
+        if (!audio.paused)
+            audio.pause();
+
+    try 
+    {
+        audio = new Audio();
+    }
+    catch(err) 
+    {
+        audio = false;
+        return;
+    } 
+
+
+    console.log("generating demo for", freq, leng, paus);
+    var rate = 31250;
+    
+    var data = [];
+    
+    var T = (rate / freq);
+    
+    // duration in sec
+    var duration = 3;
+    
+    if (leng == 0 || paus == 0)
+    {
+        leng = duration * 1000;
+        paus = 0;
+    }
+    
+    for (var i=0; i< rate * duration; i++) 
+    {
+        var ms = (i / rate) * 1000;
+        if (ms % (leng + paus) <= leng || (leng == 0 && paus == 0))
+        {
+            var val;
+        
+            if (i % T < T/2)
+                val = 255;
+            else
+                val = 0;
+                
+            data[i] = val;
+        }
+        else
+        {
+            data[i] = data[i - 1];
+        }
+    }
+    data[i - 1] = Math.random() * 256;
+        
+    wave = new RIFFWAVE(); // create the wave file
+    
+    wave.header.sampleRate = rate;
+    wave.Make(data);
+    
+    audio.src = wave.dataURI; // create the HTML5 audio element
+    audio.play(); 
+}
+
 function profile_redraw()
 {
     var plot_freq = [];
@@ -42,13 +135,23 @@ function profile_redraw()
             {data: plot_paus, label: "Pause [ms]", yaxis: 2}
         ],
         {
-	        xaxes: [ {  } ],
+            axisLabels: {
+                show: true,
+                axisLabelUseHtml: true
+            },        
+	        xaxes: [ {
+       		        axisLabel: 'Vario [m/s]',
+                 } ],
 	        yaxes: [ 
-	            { min: 0 }, 
+	            {
+	                min: 0,
+    	            axisLabel: 'Frequency [Hz]'
+	            }, 
 	            {
 		        // align if we are to the right
 		        alignTicksWithAxis: 0.5,
 		        position: "right",
+		        axisLabel: 'Duration [ms]',
 	        } ],
 	        legend: { position: "nw" },
             series: {
@@ -103,7 +206,7 @@ function find_index(right, point_index, series_index)
             break;
     }
 
-    console.log(res);
+    //console.log(res);
     return res;
 }
 
@@ -157,7 +260,7 @@ function profile_init_plot()
             if (series_index == 2)
                 field = actual_prof[profile_id].buzzer_pause;
 
-            console.log("point is:" + point_index);
+            //console.log("point is:" + point_index);
             left_index = find_index(false, point_index, series_index);
             right_index = find_index(true, point_index, series_index);
 
@@ -197,7 +300,7 @@ function profile_init_plot()
             if (lock.indexOf(point_index) == -1)
             {
                 lock.push(point_index);
-                console.log(lock);
+                //console.log(lock);
             }
                 
             profile_redraw(point_index);
@@ -226,10 +329,25 @@ function profile_resize()
 
 function tab_profile_init()
 {
-    profile_init_plot()
+    profile_init_plot();
+    
+    $('#profile_demo').spinner({
+        step: 0.1,
+        min: -10.0,
+        max: 10.0,
+        numberFormat: "f",
+        stop:function(e,ui){
+            profile_demo($(this).val());
+        }
+    });
+
+    $('#profile_demo').val(0.0);
+
+    $('#profile_demo_play').click(function(){
+        profile_demo($('#profile_demo').val());
+    });
 
     var resizeTimer;
-
 
     $("#profile_enable").click(function(){
         actual_prof[profile_id].enabled = $("#profile_enable").is(":checked");

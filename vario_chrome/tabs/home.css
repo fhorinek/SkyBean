@@ -91,3 +91,12 @@ div.alert
     position: relative;
     width: 400px;
 }
+
+div.note
+{
+    font-size: 15pt;
+    margin: 15px;
+    color: #428bca;
+    position: relative;
+    width: 400px;
+}

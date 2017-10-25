@@ -9,6 +9,8 @@
 
 SENSOR;
 
+uint8_t first_run = true;
+
 I2c i2c;
 Timer meas_timer;
 
@@ -198,7 +200,16 @@ ISR(timerD5_compareA_interrupt)
 	sensor.ReadTemperature();
 	sensor.StartPressure();
 
-	filter_step();
+	//normal mode
+	if (!first_run)
+	{
+		filter_step();
+	}
+	else
+	{
+		//skip first
+		first_run = false;
+	}
 
 	buzzer_step();
 

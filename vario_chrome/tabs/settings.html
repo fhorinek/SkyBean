@@ -40,7 +40,34 @@
         </select>
     </div>
     <div class="set_note">
-        What profile do you want to use? You can change this using button after power-on sequence.
+        What profile do you want to use? You can change this if you hold the button after power-on sequence.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-volume-off"></i> Silent start
+    </div>
+    <div class="set_value">
+
+        <input type="checkbox" name="set_supress_startup" id="set_supress_startup" value="0">
+        <label for="set_supress_startup">Enable</label>
+    </div>
+    <div class="set_note">
+        This option will suppress sound output until the filter is stabilised.
+    </div>    
+</div>
+
+<div class="line">
+    <div class="set_label">
+        <i class="fa fa-signal"></i> Fluid beep
+    </div>
+    <div class="set_value">
+        <input type="checkbox" name="set_fluid_enable" id="set_fluid_enable" value="0">
+        <label for="set_fluid_enable">Enable</label>
+    </div>
+    <div class="set_note">
+        Continous lift beep frequency update.
     </div>    
 </div>
 
@@ -78,34 +105,9 @@
     </div>    
 </div>
 
-<h2>Experimental (beta2 only)</h2>
+<!--h2>Experimental (beta2 only)</h2-->
 
-<div class="line">
-    <div class="set_label">
-        <i class="fa fa-volume-off"></i> Silent start
-    </div>
-    <div class="set_value">
 
-        <input type="checkbox" name="set_supress_startup" id="set_supress_startup" value="0">
-        <label for="set_supress_startup">Enable</label>
-    </div>
-    <div class="set_note">
-        This option will suppress sound output until the filter is stabilised.
-    </div>    
-</div>
-
-<div class="line">
-    <div class="set_label">
-        <i class="fa fa-signal"></i> Fluid beep
-    </div>
-    <div class="set_value">
-        <input type="checkbox" name="set_fluid_enable" id="set_fluid_enable" value="0">
-        <label for="set_fluid_enable">Enable</label>
-    </div>
-    <div class="set_note">
-        Continous lift beep frequency update.
-    </div>    
-</div>
 
 <!--
 <div class="line">

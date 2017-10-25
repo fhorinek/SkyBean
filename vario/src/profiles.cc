@@ -138,14 +138,6 @@ void configurator_loop()
 			_delay_ms(1);
 		}
 	}
-	printf("\n\n");
-
-	for (uint16_t i = 0; i < sizeof(data_buffer); i++)
-	{
-		//progress signaling
-		printf("%d ", data_buffer[i]);
-	}
-
 
 	printf("\n\nEE dump\n");
 	#define EE_MUL	32

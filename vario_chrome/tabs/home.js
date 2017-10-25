@@ -9,6 +9,7 @@ var pstates = {
     download_done:      7,
     upload_done:        8,
     error:              9,
+    
     fw_prog:            10,
     fw_verify:          11,
     fw_done:            12,
@@ -30,6 +31,7 @@ var pcmd = {
     prog_verify:        8,
 };
 
+var TX_MTU = 8;
 
 function chr(n)
 {
@@ -44,6 +46,7 @@ function update_progressbar(val)
 }
 
 var error_message = "unknown";
+var gui_timer = false;
 
 function update_port_state(state)
 {
@@ -58,6 +61,13 @@ function update_port_state(state)
     $("#no_wizard").hide(0);
     $("#firmware_load").hide(0);
     $("#progressbar").hide(0);
+    $("#continue").hide(0);
+
+    if (gui_timer)
+    {
+        clearTimeout(gui_timer);
+        gui_timer = false;
+    }
 
     switch(state)
     {
@@ -77,13 +87,13 @@ function update_port_state(state)
         break;
         case(pstates.wait_for_device):
             $("#port_wizard_text").html("Waiting for SkyBean");
-            $("#port_wizard_desc").html("Connect the SkyBean to interface board and turn it on.");
+            $("#port_wizard_desc").html("Turn SkyBean on.");
             $(".loader").show();
             $("#popup_cancel").show();
         break;
         case(pstates.download_cfg):
             $("#port_wizard_text").html("Downloading configuration");
-            $("#port_wizard_desc").html("Please wait until the configuration is downloaded from the SkyBean");
+            $("#port_wizard_desc").html("Please wait until the configuration is downloaded from the SkyBean<br><br><b>Do not disconnect the device!</b><br>");
         break;
         case(pstates.download_done):
             $("#port_wizard_text").html("Done");
@@ -92,15 +102,17 @@ function update_port_state(state)
         break;
         case(pstates.error):
             $("#port_wizard_text").html("Error");
-            $("#port_wizard_desc").html("There was an error during comunication with SkyBean. Please try again <br><br>Error details:<br>" + error_message);
+            $("#port_wizard_desc").html("There was an error during comunication with SkyBean. Please try again <br><br><b>Error details:</b><br></>" + error_message + "</i><br><br>Please restart the application.");
         break;       
         case(pstates.upload_cfg):
             $("#port_wizard_text").html("Uploading configuration");
-            $("#port_wizard_desc").html("Please wait until the configuration is uploaded to the SkyBean");
+            $("#port_wizard_desc").html("Please wait until the configuration is uploaded to the SkyBean<br><br><b>Do not disconnect the device!</b><br>");
+            $("#progressbar").show();
         break;            
         case(pstates.verify_cfg):
             $("#port_wizard_text").html("Verifing configuration");
-            $("#port_wizard_desc").html("Please wait until the configuration is verified");
+            $("#port_wizard_desc").html("Please wait until the configuration is verified<br><br><b>Do not disconnect the device!</b><br>");
+            $("#progressbar").show();
         break;       
         case(pstates.upload_done):
             $("#port_wizard_text").html("Done");
@@ -128,23 +140,30 @@ function update_port_state(state)
         break; 
         case(pstates.fw_erase):
             $("#port_wizard_text").html("Erasing firmware");
-            $("#port_wizard_desc").html("Erasing application on SkyBean.");
+            $("#port_wizard_desc").html("Erasing application on SkyBean.<br><br><b>Do not disconnect the device!</b><br>");
             $(".loader").show();        
         break;
         case(pstates.fw_prog):
             $("#port_wizard_text").html("Programing firmware");
-            $("#port_wizard_desc").html("Uploading new firmware to SkyBean.");
+            $("#port_wizard_desc").html("Uploading new firmware to SkyBean.<br><br><b>Do not disconnect the device!</b><br>");
             $("#progressbar").show();
         break;
         case(pstates.fw_verify):
             $("#port_wizard_text").html("Verifing firmware");
-            $("#port_wizard_desc").html("Verifing new firmware on SkyBean.");
+            $("#port_wizard_desc").html("Verifing new firmware on SkyBean.<br><br><b>Do not disconnect the device!</b><br>");
             $("#progressbar").show();
         break;
+
         case(pstates.fw_done):
-            $("#port_wizard_text").html("Sucesfully done");
-            $("#port_wizard_desc").html("New firmware was sucesfully uploaded and verified.");
-            $("#popup_close").show();
+            $("#port_wizard_text").html("Configuration update");
+            $("#port_wizard_desc").html("Please wait for new configuration update.");
+            $(".loader").show();
+            gui_timer = setTimeout(function() {
+                $("#port_wizard_text").html("Sucesfully done");
+                $("#port_wizard_desc").html("New firmware was sucesfully uploaded.");
+                $("#popup_close").show();
+                $(".loader").hide();
+            }, 1500);             
         break;
 
     }
@@ -161,11 +180,12 @@ function PortHandler()
     chrome.serial.onReceive.addListener(function (info)
     {
         data = new Uint8Array(info.data);
-        console.log("data_in");
+        console.log("data_in", data);
         
         for (i = 0; i < data.length; i++)
         {
-            port_handler.parse(String.fromCharCode(data[i]));
+            c = String.fromCharCode(data[i]);
+            port_handler.parse(c);
         }
     });
     
@@ -179,7 +199,8 @@ function PortHandler()
                 port_handler.cancel();
                 update_port_state(pstates.error);
             break;
-            case("system_error"):
+            
+            default:
                 console.log("trying to recover..");
                 if (port_handler.old_port)
                 {
@@ -369,7 +390,7 @@ function PortHandler()
                 }
             break;   
 
-            case(pcmd.get_version): //read hello
+            case(pcmd.get_version): //read version
                 this.parser_buffer += c
                 if (this.parser_buffer.length == 2)
                 {
@@ -414,19 +435,26 @@ function PortHandler()
                         this.tx_cnt = 0;   
 
                         crc = 0;
+                        c_cfg = "";
 
                         for (i in data_cfg)
+                        {
                             crc = CalcCRC(crc, CRC_KEY, data_cfg.charCodeAt(i));
+                            c_cfg += "0x" + data_cfg.charCodeAt(i).toString(16).padStart(2, '0') + ", ";
+                        }
 
                         data_cfg += String.fromCharCode(crc);
 
-                        debug_stream(data_cfg);
 
                         console.log("CALC CRC is " + crc);
 
+                        console.log(c_cfg);
+
                         this.data_to_send = data_cfg;
-                        this.send(this.data_to_send[0]);  
-                        this.data_to_send = this.data_to_send.slice(1);
+                        this.data_to_send_length = data_cfg.length;
+                        
+                        this.send(this.data_to_send.substr(0, TX_MTU));  
+                        this.data_to_send = this.data_to_send.slice(TX_MTU);
                     }
                 }
             break;               
@@ -504,10 +532,21 @@ function PortHandler()
                 if (c == '.')
                 {
                     this.tx_cnt++;
+                    
+                    if (this.tx_cnt < TX_MTU)
+                    {
+                        console.log(this.tx_cnt);
+                        break;
+                    }
+                        
+                    this.tx_cnt = 0;
+                    
                     if (this.data_to_send.length > 0)
                     {
-                        this.send(this.data_to_send[0]); 
-                        this.data_to_send = this.data_to_send.slice(1);
+                        this.send(this.data_to_send.substr(0, TX_MTU));  
+                        this.data_to_send = this.data_to_send.slice(TX_MTU);
+                        
+                        update_progressbar((this.data_to_send_length - this.data_to_send.length) / this.data_to_send_length);
                     }
                 }
 
@@ -579,13 +618,22 @@ function PortHandler()
 
                     if (this.prog_pos >= fw_bin.length)
                     {
+                        //Skip verification
+                        this.setState(pstates.fw_done);      
+                        this.task = pcmd.write_cfg;
+                        this.init_parser();
+
+                        this.send("b", function(){
+                            //port_handler.closePort();    
+                        });                    
+                    /*
                         //start verification
                         console.log("Verification start");
                         this.prog_pos = 0;
                         this.parser_cmd = pcmd.prog_verify;
                         this.parser_buffer = "";
                         this.verifyNextBlock();
-                        this.setState(pstates.fw_verify);                 
+                        this.setState(pstates.fw_verify);      */           
                     }
                     else
                         this.progNextBlock();
@@ -639,7 +687,7 @@ function PortHandler()
                         console.log("Verification done");
                         this.setState(pstates.fw_done);      
                         this.send("b", function(){
-                            this.closePort();    
+                            port_handler.closePort();    
                         });
                     }
                     else
@@ -747,7 +795,7 @@ function PortHandler()
     };
 }
 
-var file_base = "http://glados.horinek.sk/home/~horinek/skybean/";
+var file_base = "https://vps.skybean.eu/skybean/";
 var xhr = new XMLHttpRequest();
 
 var fw_list = {};

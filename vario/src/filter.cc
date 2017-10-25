@@ -103,9 +103,15 @@ void filter_step()
 	//get raw pressure
 	raw_pressure = sensor.pressure;
 
+	if (isnan(raw_pressure))
+		return;
+
 	//filter the pressure
 	pressure = kalman_update(raw_pressure);
 	//pressure = butterw(raw_pressure);
+
+	if (isnan(pressure))
+		return;
 
 	//get temperature (we do not need here, it is for the serial output)
 	temperature = sensor.temperature;

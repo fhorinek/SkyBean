@@ -23,6 +23,7 @@
 #define SLOW_CLOCK
 
 //uart debug & timing pin
+//#define ENABLE_DEFAULT_CFG
 //#define ENABLE_DEBUG_TIMING
 //#define ENABLE_DEBUG_UART
 

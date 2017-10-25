@@ -638,8 +638,8 @@ void bui_step()
 			next_step_wait = sys_tick_get();
 
 			prof.lift_treshold++;
-			if (prof.lift_treshold > 5)
-				prof.lift_treshold = 1;
+			if (prof.lift_treshold > 4)
+				prof.lift_treshold = 0;
 
 			LiftSinkRefresh();
 
@@ -651,7 +651,7 @@ void bui_step()
 		if (play_cfg)
 		{
 			play_cfg = false;
-			beep_count = prof.lift_treshold;
+			beep_count = prof.lift_treshold + 1;
 			beep_blik = BEEP_BLIK_GREEN;
 			start_sound(SOUND_BEEP);
 		}
@@ -676,8 +676,8 @@ void bui_step()
 			next_step_wait = sys_tick_get();
 
 			prof.sink_treshold++;
-			if (prof.sink_treshold > 5)
-				prof.sink_treshold = 1;
+			if (prof.sink_treshold > 4)
+				prof.sink_treshold = 0;
 
 			LiftSinkRefresh();
 
@@ -689,7 +689,7 @@ void bui_step()
 		if (play_cfg)
 		{
 			play_cfg = false;
-			beep_count = prof.sink_treshold;
+			beep_count = prof.sink_treshold + 1;
 			beep_blik = BEEP_BLIK_RED;
 			start_sound(SOUND_BEEP);
 		}

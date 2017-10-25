@@ -55,17 +55,17 @@ void pc_init()
 		//communicate with the app
 		configurator_loop();
 
-		if (cfg.serial_output == 0)
-		{
+		#ifndef ENABLE_DEBUG_UART
 			//disable uart
 			usart.Stop();
 			GpioSetDirection(portd7, INPUT); //usart TX
 
 			PR.PRPD = 0b01011101; //usart disabled
-		}
+		#endif
 	}
 
-	if (cfg.serial_output > 0 && !pc_go_to_cfg)
+#ifdef ENABLE_DEBUG_UART
+	if (!pc_go_to_cfg)
 	{
 		//start uart
 		GpioSetDirection(portd7, OUTPUT); //usart TX
@@ -73,11 +73,12 @@ void pc_init()
 		usart.Init(usartD0, 115200, 8, 32);
 		usart.SetInterruptPriority(MEDIUM);
 	}
+#endif
 }
 
 //this is for production test only
 void pc_step()
 {
-	if (cfg.serial_output == CFG_SERIAL_OUTPUT_DEBUG)
-		printf("%0.2f;%0.2f;%0.3f;%0.3f;\n", raw_pressure, pressure, altitude0, climb);
+	//if (cfg.serial_output == CFG_SERIAL_OUTPUT_DEBUG)
+	printf("%0.2f;%0.2f;%0.3f;%0.3f;\n", raw_pressure, pressure, altitude0, climb);
 }

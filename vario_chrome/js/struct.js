@@ -209,7 +209,9 @@ function get_char_array(data, index, len)
 
     for (i = 0; i < len; i++)
     {
-        val += data[index + i];
+        v = data.charCodeAt(index + i);
+        if (v >= 32 && v <=126)
+            val += data[index + i];
     }
     
     return val;

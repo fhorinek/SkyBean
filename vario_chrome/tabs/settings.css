@@ -45,3 +45,8 @@ div.line
     width: 100px;
 }
 
+i.fa
+{
+    width: 25px;
+    text-align: center;
+}

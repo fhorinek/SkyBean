@@ -249,8 +249,6 @@ if (len(sys.argv) is not 3):
 port = sys.argv[1]
 hex = sys.argv[2]    
     
-#a = StaxProg("/dev/ttyACM0", 115200)
-#a.batch("/home/horinek/data/workspace/RGBtest/Debug/RGBtest.hex")
 
 a = StaxProg(port, 115200)
 a.batch(hex)
