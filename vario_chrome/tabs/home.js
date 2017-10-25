@@ -189,9 +189,8 @@ function PortHandler()
         }
     });
     
-    chrome.serial.onReceiveError.addListener(function watch_for_on_receive_errors(info) {
+	function watch_for_on_receive_errors(info) {
         console.log(info);
-
         switch (info.error)
         {
             case("device_lost"):
@@ -206,10 +205,20 @@ function PortHandler()
                 {
                     chrome.serial.disconnect(port_handler.port_info.connectionId, function(){
                         console.log("closing fast");
+						console.log(chrome.runtime.lastError);
                         chrome.serial.connect(port_handler.old_port, {bitrate: 115200}, function(info){
-                            console.log("port reopened");
-                            console.log(info);
-                            port_handler.port_info = info;
+							if (chrome.runtime.lastError)
+							{
+								console.log(chrome.runtime.lastError);
+								info = {connectionId: port_handler.port_info.connectionId, error: "break"};
+								watch_for_on_receive_errors(info);
+							}
+							else
+							{
+								console.log("port reopened");
+								console.log(info);
+								port_handler.port_info = info;
+							}
 
                         });
                     });
@@ -217,7 +226,9 @@ function PortHandler()
 
             break;
         }
-    });
+    }
+
+	chrome.serial.onReceiveError.addListener(watch_for_on_receive_errors);
 
 
     this.getStates = function()
